@@ -43,15 +43,18 @@ extern "C" {
 #define SAMPLE_POOL_ID      0
 
 /* Argument size passed to the control message queue */
-#define ARG_SIZE 32
+#define ARG1_SIZE 			256
+#define ARG2_SIZE			128
 
 /* Control message data structure. */
 /* Must contain a reserved space for the header */
 typedef struct ControlMsg 
 {
-    MSGQ_MsgHeader header;
-    Uint16 command;
-    int arg1[ARG_SIZE][ARG_SIZE];
+    MSGQ_MsgHeader 	header;
+    Uint16 			command;
+    Char 			arg1[ARG1_SIZE];
+    Uint16 			arg2[ARG2_SIZE][ARG2_SIZE];
+    //Uint32 arg2;
 } ControlMsg;
 
 /* Messaging buffer used by the application.

@@ -29,7 +29,7 @@ extern "C"
     int main (int argc, char** argv)
     {
         Char8* dspExecutable = NULL;
-        Char8* strNumIterations = NULL;
+        Char8* strMatrixSize = NULL;
         Char8* strProcessorId = NULL;
         Uint8 processorId = 0;
 
@@ -38,8 +38,7 @@ extern "C"
 
         if ((argc != 4) && (argc!=3))
         {
-            SYSTEM_1Print("Usage : %s <absolute path of DSP executable> <number of transfers> <DSP Processor Id>\n"
-                          "For infinite transfers, use value of 0 for <number of transfers>\n"
+            SYSTEM_1Print("Usage : %s <absolute path of DSP executable> <matrix size> <DSP Processor Id>\n"
                           "For DSP Processor Id,"
                           "\n\t use value of 0  if sample needs to be run on DSP 0 "
                           "\n\t use value of 1  if sample needs to be run on DSP 1"
@@ -50,7 +49,7 @@ extern "C"
         else
         {
             dspExecutable = argv[1];
-            strNumIterations = argv[2];
+            strMatrixSize = argv[2];
 
             if (argc == 3)
             {
@@ -65,7 +64,10 @@ extern "C"
 
             if (processorId < MAX_PROCESSORS)
             {
-                helloDSP_Main(dspExecutable, strNumIterations, strProcessorId);
+                if (atoi(strMatrixSize) == 0)
+                    SYSTEM_0Print("Matrix size must be greater than 0\n");
+                else
+                    helloDSP_Main(dspExecutable, strMatrixSize, strProcessorId);
             }
         }
 

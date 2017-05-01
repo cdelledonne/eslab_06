@@ -40,12 +40,13 @@ extern "C" {
 Uint8 dspMsgQName[DSP_MAX_STRLEN];
 
 /* Number of iterations message transfers to be done by the application. */
-extern Uint16 numTransfers;
+extern Uint16 matrixSize;
 
+#define MAXSIZE         128
 
-#define MATSIZE         32
-
-#define MAXSIZE         32
+/* Matrices to store results from GPP */
+Uint16 mat1[MAXSIZE][MAXSIZE];
+Uint16 mat2[MAXSIZE][MAXSIZE];
 
 
 /** ============================================================================
@@ -76,7 +77,7 @@ Int TSKMESSAGE_create(TSKMESSAGE_TransferInfo** infoPtr)
     else
     {
         info = *infoPtr;
-        info->numTransfers = numTransfers;
+        info->matrixSize = matrixSize;
         info->localMsgq = MSGQ_INVALIDMSGQ;
         info->locatedMsgq = MSGQ_INVALIDMSGQ;
     }
@@ -145,19 +146,26 @@ Int TSKMESSAGE_execute(TSKMESSAGE_TransferInfo* info)
     Int status = SYS_OK;
     ControlMsg* msg;
     Uint32 i;
-
-    int mat1[MATSIZE][MATSIZE], mat2[MATSIZE][MATSIZE], prod[MATSIZE][MATSIZE];
-    int j, k;
+    Uint16 j, k, l;
+    Uint16 (*matrixpt)[MAXSIZE];
+    //Uint16 mat1[MAXSIZE][MAXSIZE];
+    //Uint16 mat2[MAXSIZE][MAXSIZE];
 
     /* Allocate and send the message */
     status = MSGQ_alloc(SAMPLE_POOL_ID, (MSGQ_Msg*) &msg, APP_BUFFER_SIZE);
+    matrixpt = msg->arg2;
 
     if (status == SYS_OK)
     {
         MSGQ_setMsgId((MSGQ_Msg) msg, info->sequenceNumber);
         MSGQ_setSrcQueue((MSGQ_Msg) msg, info->localMsgq);
         msg->command = 0x01;
-        // SYS_sprintf(msg->arg1, "DSP is awake!");
+        SYS_sprintf(msg->arg1, "DSP is awake!");
+
+    //    matrixpt = msg->arg2;
+        for (j=0; j<matrixSize; j++)
+            for (k=0; k<matrixSize; k++)
+                matrixpt[j][k] = 0;
 
         status = MSGQ_put(info->locatedMsgq, (MSGQ_Msg) msg);
         if (status != SYS_OK)
@@ -172,9 +180,8 @@ Int TSKMESSAGE_execute(TSKMESSAGE_TransferInfo* info)
         SET_FAILURE_REASON(status);
     }
 
-    /* Execute the loop for the configured number of transfers  */
-    /* A value of 0 in numTransfers implies infinite iterations */
-    for (i = 0; (i < 2) && (status == SYS_OK); i++)
+    /* Execute the loop to receive the two matrices */
+    for (i = 0; ( (i < 2) && (status == SYS_OK) ); i++)
     {
         /* Receive a message from the GPP */
         status = MSGQ_get(info->localMsgq,(MSGQ_Msg*) &msg, SYS_FOREVER);
@@ -204,71 +211,56 @@ Int TSKMESSAGE_execute(TSKMESSAGE_TransferInfo* info)
             else
             {
 		/* Include your control flag or processing code here */
-                if (!i)
+                if (i == 0) 
                 {
-                    for (j = 0; j < MATSIZE; j++)
-                        for (k = 0; k < MATSIZE; k++)
-                            mat1[j][k] = (msg->arg1)[j][k];
-                    msg->command = 0x01;
-                    // SYS_sprintf(msg->arg1, "Iteration %d is complete.", i);
+                    for (j=0; j<matrixSize; j++)
+                        for (k=0; k<matrixSize; k++)
+                            mat1[j][k] = matrixpt[j][k];
+                    msg->command = 0x02;
+            //        SYS_sprintf(msg->arg1, "Iteration %d is complete.", i);
 
                     /* Increment the sequenceNumber for next received message */
                     info->sequenceNumber++;
                     /* Make sure that sequenceNumber stays within the range of iterations */
                     if (info->sequenceNumber == MSGQ_INTERNALIDSSTART)
-                    {
                         info->sequenceNumber = 0;
-                    }
                     MSGQ_setMsgId((MSGQ_Msg) msg, info->sequenceNumber);
                     MSGQ_setSrcQueue((MSGQ_Msg) msg, info->localMsgq);
 
                     /* Send the message back to the GPP */
                     status = MSGQ_put(info->locatedMsgq,(MSGQ_Msg) msg);
                     if (status != SYS_OK)
-                    {
                         SET_FAILURE_REASON(status);
-                    }
                 }
                 else
                 {
-                    for (j = 0; j < MATSIZE; j++)
-                        for (k = 0; k < MATSIZE; k++)
-                            mat2[j][k] = (msg->arg1)[j][k];
-
-                    for (i = 0; i < MATSIZE; i++)
-                    {
-                        for (j = 0; j < MATSIZE; j++)
-                        {
-                            prod[i][j]=0;
-                            for (k = 0; k < MATSIZE; k++)
-                                prod[i][j] = prod[i][j] + mat1[i][k] * mat2[k][j];
-                        }
-                    } 
-
+                    for (j=0; j < matrixSize; j++)
+                        for (k=0; k < matrixSize; k++)
+                            mat2[j][k] = matrixpt[j][k];
                     msg->command = 0x02;
-                    // SYS_sprintf(msg->arg1, "Iteration %d is complete.", i);
+
+                    for (j = 0; j < matrixSize; j++)
+                        for (k = 0; k < matrixSize; k++)
+                        {
+                            matrixpt[j][k] = 0;
+                            for(l = 0; l < matrixSize; l++)
+                                matrixpt[j][k] = matrixpt[j][k] + mat1[j][l] * mat2[l][k];
+                        }
 
                     /* Increment the sequenceNumber for next received message */
                     info->sequenceNumber++;
                     /* Make sure that sequenceNumber stays within the range of iterations */
                     if (info->sequenceNumber == MSGQ_INTERNALIDSSTART)
-                    {
                         info->sequenceNumber = 0;
-                    }
                     MSGQ_setMsgId((MSGQ_Msg) msg, info->sequenceNumber);
                     MSGQ_setSrcQueue((MSGQ_Msg) msg, info->localMsgq);
-
-                    for (j = 0; j < MATSIZE; j++)
-                        for (k = 0; k < MATSIZE; k++)
-                            (msg->arg1)[j][k] = prod[j][k];
 
                     /* Send the message back to the GPP */
                     status = MSGQ_put(info->locatedMsgq,(MSGQ_Msg) msg);
                     if (status != SYS_OK)
-                    {
-                        SET_FAILURE_REASON(status);
-                    }
-                }   
+                        SET_FAILURE_REASON(status);        
+                }
+
             }
         }
         else

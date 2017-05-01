@@ -22,8 +22,8 @@ extern "C" {
 /* FILEID is used by SET_FAILURE_REASON macro. */
 #define FILEID  FID_APP_C
 
-/* Number of iterations message transfers to be done by the application. */
-Uint16 numTransfers;
+/* Matrix size. */
+Uint16 matrixSize;
 
 /** ----------------------------------------------------------------------------
  *  @func   tskMessage
@@ -55,8 +55,8 @@ Void main(Int argc, Char* argv [])
     TSK_Handle tskMessageTask;
 
 #if !defined (DSP_BOOTMODE_NOBOOT)
-    /* Get the number of transfers to be done by the application */
-    numTransfers = atoi(argv [0]);
+    /* Get the matrix size */
+    matrixSize = atoi(argv [0]);
     /* Initialize DSP/BIOS LINK. */
     DSPLINK_init();
 #endif

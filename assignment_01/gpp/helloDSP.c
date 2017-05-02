@@ -22,6 +22,7 @@
 #include <system_os.h>
 
 #include <stdio.h>
+#include "Timer.h"
 
 
 #if defined (__cplusplus)
@@ -273,6 +274,9 @@ extern "C"
 #if defined (PROFILE)
         SYSTEM_GetStartTime();
 #endif
+        Timer totalTime;
+        initTimer(&totalTime, "Total Time");
+        startTimer(&totalTime);
 
         for (i = 0; ( (i < 3) && (DSP_SUCCEEDED (status)) ); i++)
         {
@@ -294,7 +298,7 @@ extern "C"
                 }
             }
 #endif
-            
+
             matrixpt = msg->arg2;
             if (i == 0)
             {
@@ -330,6 +334,8 @@ extern "C"
                 }
                 SYSTEM_0Print("\n");
                 MSGQ_free((MsgqMsg) msg);
+                stopTimer(&totalTime);
+                printTimer(&totalTime);
             }
             else
             {
@@ -354,7 +360,7 @@ extern "C"
                     sequenceNumber = 0;
                 }
 
-#if !defined (PROFILE)
+/*#if !defined (PROFILE)
                 if (DSP_SUCCEEDED(status) && ((i % 100) == 0))
                     SYSTEM_1Print("Transferred %ld messages\n", i);
 #endif
@@ -367,7 +373,7 @@ extern "C"
             SYSTEM_GetEndTime();
             SYSTEM_GetProfileInfo(matrixSize);
         }
-#endif
+#endif*/
 
         SYSTEM_0Print("Leaving helloDSP_Execute ()\n");
 

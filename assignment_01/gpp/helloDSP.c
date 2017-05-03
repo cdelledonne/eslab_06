@@ -275,7 +275,13 @@ extern "C"
         SYSTEM_GetStartTime();
 #endif
         Timer totalTime;
+        Timer mat1time;
+        Timer mat2time;
+        Timer printtime;
         initTimer(&totalTime, "Total Time");
+        initTimer(&mat1time,"Generation Time of Matrix 1");
+        initTimer(&mat2time,"Generation Time of Matrix 2");
+        initTimer(&printtime,"Printing time");
         startTimer(&totalTime);
 
         for (i = 0; ( (i < 3) && (DSP_SUCCEEDED (status)) ); i++)
@@ -302,15 +308,19 @@ extern "C"
             matrixpt = msg->arg2;
             if (i == 0)
             {
+              startTimer(&mat1time);
                 for (j = 0; j < matrixSize; j++)
                     for (k = 0; k < matrixSize; k++)
                         matrixpt[j][k] = j+k*2;
+                        stopTimer(&mat1time);
             }
             else if (i == 1)
             {
+              startTimer(&mat2time);
                 for (j = 0; j < matrixSize; j++)
                     for (k = 0; k < matrixSize; k++)
                         matrixpt[j][k] = j+k*3;
+                        stopTimer(&mat2time);
             }
 
         //    matrixpt = msg->arg2;
@@ -327,15 +337,21 @@ extern "C"
 
             /* If the message received is the final one, free it. */
             if (i == 2) {
+              startTimer(&printtime);
                 for (j=0; j<matrixSize; j++) {
                     SYSTEM_0Print("\n");
                     for (k=0; k<matrixSize; k++)
                         SYSTEM_1Print("\t%d ", matrixpt[j][k]);
                 }
                 SYSTEM_0Print("\n");
-                MSGQ_free((MsgqMsg) msg);
+                stopTimer(&printtime);
                 stopTimer(&totalTime);
                 printTimer(&totalTime);
+                printTimer(&mat1time);
+                printTimer(&mat2time);
+                printTimer(&printtime);
+                MSGQ_free((MsgqMsg) msg);
+
             }
             else
             {
@@ -360,7 +376,7 @@ extern "C"
                     sequenceNumber = 0;
                 }
 
-/*#if !defined (PROFILE)
+#if !defined (PROFILE)
                 if (DSP_SUCCEEDED(status) && ((i % 100) == 0))
                     SYSTEM_1Print("Transferred %ld messages\n", i);
 #endif
@@ -373,7 +389,7 @@ extern "C"
             SYSTEM_GetEndTime();
             SYSTEM_GetProfileInfo(matrixSize);
         }
-#endif*/
+#endif
 
         SYSTEM_0Print("Leaving helloDSP_Execute ()\n");
 

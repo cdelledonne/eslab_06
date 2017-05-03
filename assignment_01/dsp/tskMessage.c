@@ -28,6 +28,9 @@
 #include <helloDSP_config.h>
 #include <tskMessage.h>
 
+/*  ----------------------------------- Timer Headers               */
+#include "c6x.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -148,6 +151,7 @@ Int TSKMESSAGE_execute(TSKMESSAGE_TransferInfo* info)
     Uint32 i;
     Uint16 j, k, l;
     Uint16 (*matrixpt)[MAXSIZE];
+    int start, stop, total; // cycle counters
 
     // allocate and send the message
     status = MSGQ_alloc(SAMPLE_POOL_ID, (MSGQ_Msg*) &msg, APP_BUFFER_SIZE);
@@ -236,6 +240,8 @@ Int TSKMESSAGE_execute(TSKMESSAGE_TransferInfo* info)
                     msg->command = 0x02;
 
                     // compute product
+                    TSCL = 0;
+                    start = TSCL;
                     for (j = 0; j < matrixSize; j++)
                         for (k = 0; k < matrixSize; k++)
                         {
@@ -243,6 +249,9 @@ Int TSKMESSAGE_execute(TSKMESSAGE_TransferInfo* info)
                             for(l = 0; l < matrixSize; l++)
                                 matrixpt[j][k] = matrixpt[j][k] + mat1[j][l] * mat2[l][k];
                         }
+                    stop = TSCL;
+                    total = stop - start;
+                    SYS_sprintf(msg->arg1, "Product execution cycles: %d", total);
                 }
 
                 // send the message back to the GPP

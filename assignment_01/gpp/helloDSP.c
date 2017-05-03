@@ -306,15 +306,15 @@ extern "C"
                         matrixpt[j][k] = j+k*3;
             }
 
-            // if the message received is the final one, print the result and
-            // free the message
+            // if the message received is the final one,
+            // print the result and free the message
             if (i == 2) {
                 for (j = 0; j < matrixSize; j++) {
                     SYSTEM_0Print("\n");
                     for (k = 0; k < matrixSize; k++)
                         SYSTEM_1Print("\t%d ", matrixpt[j][k]);
                 }
-                SYSTEM_0Print("\n\n");
+                SYSTEM_1Print("\n\n%s\n\n", (Uint32) msg->arg1);
                 MSGQ_free((MsgqMsg) msg);
             }
             else

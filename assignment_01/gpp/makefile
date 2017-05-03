@@ -84,6 +84,16 @@ INCLUDES := -I$(DSPLINK)/gpp/inc                   \
             -I./
 
 #   ----------------------------------------------------------------------------
+#   Compiler options to use NEON
+#   ----------------------------------------------------------------------------
+NEON_CFLAGS := -march=armv7-a              \
+               -mtune=cortex-a8            \
+               -mfpu=neon                  \
+               -ftree-vectorize            \
+               -mfloat-abi=softfp          \
+               -funsafe-math-optimizations
+
+#   ----------------------------------------------------------------------------
 #   All compiler options to be passed to the command line
 #   ----------------------------------------------------------------------------
 ALL_CFLAGS := $(INCLUDES)                   \

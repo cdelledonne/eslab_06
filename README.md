@@ -1,5 +1,4 @@
-# Embedded Systems Laboratory
-## group 06
+# Embedded Systems Laboratory - group 06
 
 ### `assignment_01`
 Contains the code related to the first assignment.

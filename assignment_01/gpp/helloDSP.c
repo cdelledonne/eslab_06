@@ -504,9 +504,7 @@ extern "C"
 
                     /* Execute the message execute phase. */
                     if (DSP_SUCCEEDED(status))
-                    {
                         status = helloDSP_Execute(matrixSize, processorId);
-                    }
 
                     /* Perform cleanup operation. */
                     helloDSP_Delete(processorId);

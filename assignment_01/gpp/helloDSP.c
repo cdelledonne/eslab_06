@@ -483,10 +483,10 @@ extern "C"
         {
             matrixSize = SYSTEM_Atoi(strMatrixSize);
 
-            if (matrixSize > 0xFFFF)
+            if (matrixSize > ARG2_SIZE)
             {
                 status = DSP_EINVALIDARG;
-                SYSTEM_1Print("ERROR! Invalid arguments specified for helloDSP application.\n Max iterations = %d\n", 0xFFFF);
+                SYSTEM_1Print("ERROR! Invalid arguments specified for helloDSP application.\n Max matrix size = %d\n", ARG2_SIZE);
             }
             else
             {

@@ -278,9 +278,10 @@ extern "C"
         Timer mat1time;
         Timer mat2time;
         Timer printtime;
+        double actualTime = 0;
         initTimer(&totalTime, "Total Time");
-        initTimer(&mat1time,"Generation Time of Matrix 1");
-        initTimer(&mat2time,"Generation Time of Matrix 2");
+        initTimer(&mat1time,"Matrix_1 time");
+        initTimer(&mat2time,"Matrix_2 time");
         initTimer(&printtime,"Printing time");
         startTimer(&totalTime);
 
@@ -342,7 +343,8 @@ extern "C"
                     SYSTEM_0Print("\n");
                     for (k=0; k<matrixSize; k++)
                         SYSTEM_1Print("\t%d ", matrixpt[j][k]);
-                }
+                SYSTEM_1Print("Message received: %s\n", (Uint32) msg->arg1);
+              }
                 SYSTEM_0Print("\n");
                 stopTimer(&printtime);
                 stopTimer(&totalTime);
@@ -350,6 +352,11 @@ extern "C"
                 printTimer(&mat1time);
                 printTimer(&mat2time);
                 printTimer(&printtime);
+                actualTime = totalTime.elapsedTime;
+                           //- mat1time.elapsedTime
+                           //- mat2time.elapsedTime
+                           //- printtime.elapsedTime;
+                SYSTEM_1Print("Actual time: %g\n", actualTime);
                 MSGQ_free((MsgqMsg) msg);
 
             }

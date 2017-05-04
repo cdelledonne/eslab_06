@@ -114,6 +114,15 @@ extern "C"
     /* Extern declaration to the default DSP/BIOS LINK configuration structure. */
     extern LINKCFG_Object LINKCFG_config;
 
+
+    /* Matrices */
+    //Uint16 mat1[ARG2_SIZE][ARG2_SIZE];
+    //Uint16 mat2[ARG2_SIZE][ARG2_SIZE];
+
+    // extern Uint32 startUsecTime;
+    // extern Uint32 endUsecTime;
+
+
 #if defined (VERIFY_DATA)
     /** ============================================================================
      *  @func   helloDSP_VerifyData
@@ -268,7 +277,28 @@ extern "C"
         ControlMsg *msg;
         Uint16 (*matrixpt)[ARG2_SIZE];
 
+        Uint32 actualTime = 0;
+
+        // Timers
+        // double actualTime;
+        // Timer totalTime, mat1Time, mat2Time, printTime;
+        // initTimer(&totalTime, "Total Time");
+        // initTimer(&mat1Time, "Mat1 Time");
+        // initTimer(&mat2Time, "Mat2 Time");
+        // initTimer(&printTime, "Print Time");
+
         SYSTEM_0Print("Entered helloDSP_Execute ()\n");
+
+        // startTimer(&totalTime);
+/*
+        for (j = 0; j < matrixSize; j++)
+            for (k = 0; k < matrixSize; k++)
+                mat1[j][k] = j+k*2;
+
+        for (j = 0; j < matrixSize; j++)
+            for (k = 0; k < matrixSize; k++)
+                mat2[j][k] = j+k*3;
+*/
 
 #if defined (PROFILE)
         SYSTEM_GetStartTime();
@@ -295,25 +325,42 @@ extern "C"
             matrixpt = msg->arg2;
             if (i == 0)
             {
+#if defined (PROFILE)
+        // SYSTEM_GetEndTime();
+        actualTime += SYSTEM_GetEndTime();
+#endif
+                // startTimer(&mat1Time);
                 for (j = 0; j < matrixSize; j++)
                     for (k = 0; k < matrixSize; k++)
                         matrixpt[j][k] = j+k*2;
+                // stopTimer(&mat1Time);
+#if defined (PROFILE)
+        SYSTEM_GetStartTime();
+#endif
             }
             else if (i == 1)
             {
+#if defined (PROFILE)
+        actualTime += SYSTEM_GetEndTime();
+#endif
+                // startTimer(&mat2Time);
                 for (j = 0; j < matrixSize; j++)
                     for (k = 0; k < matrixSize; k++)
                         matrixpt[j][k] = j+k*3;
+                // stopTimer(&mat2Time);
+#if defined (PROFILE)
+        SYSTEM_GetStartTime();
+#endif
             }
 
             // if the message received is the final one,
             // print the result and free the message
             if (i == 2) {
-                for (j = 0; j < matrixSize; j++) {
-                    SYSTEM_0Print("\n");
-                    for (k = 0; k < matrixSize; k++)
-                        SYSTEM_1Print("\t%d ", matrixpt[j][k]);
-                }
+                //for (j = 0; j < matrixSize; j++) {
+                //    SYSTEM_0Print("\n");
+                //    for (k = 0; k < matrixSize; k++)
+                //        SYSTEM_1Print("\t%d ", matrixpt[j][k]);
+                //}
                 SYSTEM_1Print("\n\n%s\n\n", (Uint32) msg->arg1);
                 MSGQ_free((MsgqMsg) msg);
             }
@@ -348,10 +395,14 @@ extern "C"
 #if defined (PROFILE)
         if (DSP_SUCCEEDED(status))
         {
-            SYSTEM_GetEndTime();
-            SYSTEM_GetProfileInfo(matrixSize);
+            actualTime += SYSTEM_GetEndTime();
+            // SYSTEM_GetProfileInfo(matrixSize);
         }
 #endif
+
+        // stopTimer(&totalTime);
+        // actualTime = totalTime.elapsedTime - mat1Time.elapsedTime - mat2Time.elapsedTime;
+        SYSTEM_1Print("Actual time = %d\n", actualTime);
 
         SYSTEM_0Print("Leaving helloDSP_Execute ()\n");
 

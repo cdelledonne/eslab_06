@@ -236,7 +236,7 @@ extern "C"
      *  @modif  endUsecTime
      *  ============================================================================
      */
-    NORMAL_API Void SYSTEM_GetEndTime(Void)
+    NORMAL_API Uint32 SYSTEM_GetEndTime(Void)
     {
         DSP_STATUS status = DSP_SOK;
         Int32 osStatus = 0;
@@ -252,6 +252,7 @@ extern "C"
         {
             endUsecTime = (((currentTime.tv_sec - initialUsecTime.tv_sec) * 1000000) + (currentTime.tv_usec - initialUsecTime.tv_usec));
         }
+        return endUsecTime;
     }
 
     /** ============================================================================

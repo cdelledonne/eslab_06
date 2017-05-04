@@ -53,9 +53,10 @@ extern "C"
     typedef struct ControlMsg
     {
         MSGQ_MsgHeader header;
-        Uint16 command;
-        Char8 arg1[ARG1_SIZE];
-        Uint16 arg2[ARG2_SIZE][ARG2_SIZE];
+        Uint16      command;
+        // Char8 arg1[ARG1_SIZE];
+        int         arg1;
+        Uint16      arg2[ARG2_SIZE][ARG2_SIZE];
         //Uint32 arg2;
     } ControlMsg;
 
@@ -323,6 +324,7 @@ extern "C"
 #endif
             // input matrices generation
             matrixpt = msg->arg2;
+            msg->command = 0x02;
             if (i == 0)
             {
 #if defined (PROFILE)
@@ -361,7 +363,7 @@ extern "C"
                 //    for (k = 0; k < matrixSize; k++)
                 //        SYSTEM_1Print("\t%d ", matrixpt[j][k]);
                 //}
-                SYSTEM_1Print("\n\n%s\n\n", (Uint32) msg->arg1);
+                SYSTEM_1Print("\n\nCycles spent on multiplication: %d\n\n", (int) msg->arg1);
                 MSGQ_free((MsgqMsg) msg);
             }
             else

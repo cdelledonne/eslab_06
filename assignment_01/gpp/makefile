@@ -41,7 +41,7 @@ DSPLINK := /opt/bbToolChain/usr/local/share/bbframework/platform/beagle-linux/to
 #   ----------------------------------------------------------------------------
 #   General options, sources and libraries
 #   ----------------------------------------------------------------------------
-SRCS := helloDSP.c system_os.c main.c
+SRCS := helloDSP.c system_os.c main.c Timer.c
 OBJS :=
 DEBUG :=
 LDFLAGS := -lpthread
@@ -82,6 +82,16 @@ INCLUDES := -I$(DSPLINK)/gpp/inc                   \
             -I$(DSPLINK)/gpp/inc/sys/Linux/2.6.18  \
             -I$(BASE_TOOLCHAIN)/include \
             -I./
+
+#   ----------------------------------------------------------------------------
+#   Compiler options to use NEON
+#   ----------------------------------------------------------------------------
+NEON_CFLAGS := -march=armv7-a              \
+               -mtune=cortex-a8            \
+               -mfpu=neon                  \
+               -ftree-vectorize            \
+               -mfloat-abi=softfp          \
+               -funsafe-math-optimizations
 
 #   ----------------------------------------------------------------------------
 #   All compiler options to be passed to the command line
@@ -163,7 +173,7 @@ $(OBJDIR_R)/%.o : %.c
 	@$(BASE_TOOLCHAIN)/bin/$(CC) $(DEFS) $(ALL_CFLAGS) -o$@ $<
 
 send:
-	scp $(BINDIR_R)/$(BIN) root@192.168.0.202:/home/root/esLAB/helloDSP/.
+	scp -P 40022 $(BINDIR_R)/$(BIN) root@80.112.147.22:/home/root/esLAB/carlo/
 
 .PHONY: clean
 clean:

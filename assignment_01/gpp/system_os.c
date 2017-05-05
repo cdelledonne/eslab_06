@@ -236,7 +236,7 @@ extern "C"
      *  @modif  endUsecTime
      *  ============================================================================
      */
-    NORMAL_API Void SYSTEM_GetEndTime(Void)
+    NORMAL_API Uint32 SYSTEM_GetEndTime(Void)
     {
         DSP_STATUS status = DSP_SOK;
         Int32 osStatus = 0;
@@ -252,6 +252,7 @@ extern "C"
         {
             endUsecTime = (((currentTime.tv_sec - initialUsecTime.tv_sec) * 1000000) + (currentTime.tv_usec - initialUsecTime.tv_usec));
         }
+        return endUsecTime;
     }
 
     /** ============================================================================
@@ -264,7 +265,7 @@ extern "C"
      */
     NORMAL_API
     Void
-    SYSTEM_GetProfileInfo(Uint32 numIterations)
+    SYSTEM_GetProfileInfo(Uint32 matrixSize)
     {
         Real32 roundTripTime = 0;
         Uint32 usecTimeTaken = 0;
@@ -273,13 +274,13 @@ extern "C"
         usecTimeTaken = (endUsecTime - startUsecTime);
         if (usecTimeTaken != 0)
         {
-            roundTripTime = (Real32)((Real32)(usecTimeTaken) / (Real32)(numIterations));
+            roundTripTime = (Real32)((Real32)(usecTimeTaken) / (Real32)(matrixSize));
         }
 
         /* To calculate number of seconds in usecTimeTaken */
         numSeconds = (Real32)((Real32) usecTimeTaken / 1000000.0);
 
-        SYSTEM_1Print("Transferring %d iterations took ", numIterations);
+        SYSTEM_0Print("Generating two matrices and computing the product matrix took\n");
         SYSTEM_1Print("%d seconds ", numSeconds);
         SYSTEM_1Print("%d microseconds.\n", (Real32)(usecTimeTaken % 1000000));
 

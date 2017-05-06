@@ -256,16 +256,16 @@ extern "C"
      *  @see    None
      *  ============================================================================
      */
-    NORMAL_API Uint32 SYSTEM_GetEndTime(Void);
+    NORMAL_API Void SYSTEM_GetEndTime(Void);
 
 
     /** ============================================================================
      *  @func   SYSTEM_GetProfileInfo
      *
-     *  @desc   It converts a time variable to elapsed time structure.
+     *  @desc   Computes the time takes by the piece of code wrapped between
+     *          SYSTEM_GetStartTime() and SYSTEM_GetEndTime.
      *
-     *  @arg    numIterations
-     *             Number of iteratiosn for which SYSTEM sample is excuted.
+     *  @ret    Elapsed time
      *
      *  @enter  None
      *
@@ -274,7 +274,7 @@ extern "C"
      *  @see    None
      *  ============================================================================
      */
-    NORMAL_API Void SYSTEM_GetProfileInfo(Uint32 numIterations);
+    NORMAL_API Uint32 SYSTEM_GetProfileInfo(Void);
 
 #endif /* if defined (PROFILE) */
 

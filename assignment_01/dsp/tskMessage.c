@@ -150,10 +150,14 @@ Int TSKMESSAGE_execute(TSKMESSAGE_TransferInfo* info)
     ControlMsg* msg;
     Uint32 i;
     Uint16 j, k, l;
-    Uint16 (*matrixpt)[MAXSIZE];
-    int start, stop, total; // cycle counters
 
-    // allocate and send the message
+    /* Pointer to a matrix */
+    Uint16 (*matrixpt)[MAXSIZE];
+
+    /* Cycle counters */
+    int start, stop, total;
+
+    /* Allocate and send the message */
     status = MSGQ_alloc(SAMPLE_POOL_ID, (MSGQ_Msg*) &msg, APP_BUFFER_SIZE);
     matrixpt = msg->arg2;
 
@@ -163,21 +167,27 @@ Int TSKMESSAGE_execute(TSKMESSAGE_TransferInfo* info)
         MSGQ_setSrcQueue((MSGQ_Msg) msg, info->localMsgq);
         msg->command = 0x01;
 
+        for (j=0; j<matrixSize; j++)
+            for (k=0; k<matrixSize; k++)
+                matrixpt[j][k] = 0;
+
         status = MSGQ_put(info->locatedMsgq, (MSGQ_Msg) msg);
         if (status != SYS_OK)
         {
-            // free the message
+            /* Must free the message */
             MSGQ_free ((MSGQ_Msg) msg);
             SET_FAILURE_REASON(status);
         }
     }
     else
+    {
         SET_FAILURE_REASON(status);
+    }
 
-    /* Execute the loop to receive the two matrices */
+    /* Execute the loop to receive the two matrices and send back the result */
     for (i = 0; ( (i < 2) && (status == SYS_OK) ); i++)
     {
-        // receive a message from the GPP
+        /* Receive a message from the GPP */
         status = MSGQ_get(info->localMsgq,(MSGQ_Msg*) &msg, SYS_FOREVER);
         if (status == SYS_OK)
         {
@@ -204,8 +214,8 @@ Int TSKMESSAGE_execute(TSKMESSAGE_TransferInfo* info)
             }
             else
             {
-		
-            // include your control flag or processing code here
+
+		/* Include your control flag or processing code here */
 
                 /* Increment the sequenceNumber for next received message */
                 info->sequenceNumber++;
@@ -217,21 +227,26 @@ Int TSKMESSAGE_execute(TSKMESSAGE_TransferInfo* info)
 
                 if (i == 0) 
                 {
-                    // store first matrix
+                    /* Store first matrix */
                     for (j=0; j<matrixSize; j++)
                         for (k=0; k<matrixSize; k++)
                             mat1[j][k] = matrixpt[j][k];
                     msg->command = 0x02;
+
+                    /* Send the ACK back to the GPP */
+                    status = MSGQ_put(info->locatedMsgq,(MSGQ_Msg) msg);
+                    if (status != SYS_OK)
+                        SET_FAILURE_REASON(status);
                 }
                 else
                 {
-                    // store second matrix
+                    /* Store second matrix */
                     for (j=0; j < matrixSize; j++)
                         for (k=0; k < matrixSize; k++)
                             mat2[j][k] = matrixpt[j][k];
                     msg->command = 0x02;
 
-                    // compute product
+                    /* Compute the product and time the computation */
                     TSCL = 0;
                     start = TSCL;
                     for (j = 0; j < matrixSize; j++)
@@ -244,12 +259,13 @@ Int TSKMESSAGE_execute(TSKMESSAGE_TransferInfo* info)
                     stop = TSCL;
                     total = stop - start;
                     msg->arg1 = total;
+
+                    /* Send the result back to the GPP */
+                    status = MSGQ_put(info->locatedMsgq,(MSGQ_Msg) msg);
+                    if (status != SYS_OK)
+                        SET_FAILURE_REASON(status);        
                 }
 
-                // send the message back to the GPP
-                status = MSGQ_put(info->locatedMsgq,(MSGQ_Msg) msg);
-                if (status != SYS_OK)
-                    SET_FAILURE_REASON(status);
             }
         }
         else

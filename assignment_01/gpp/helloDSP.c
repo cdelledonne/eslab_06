@@ -358,7 +358,7 @@ extern "C"
                     for (k=0; k<matrixSize; k++)
                         SYSTEM_1Print("\t%d ", matrixpt[j][k]);
                 }
-                SYSTEM_0Print("\n");
+                SYSTEM_0Print("\n\n");
                 SYSTEM_1Print("Cycles spent on multiplication: %d\n", msg->arg1);
 
                 /* Start the timer again */
@@ -398,8 +398,7 @@ extern "C"
         {
             SYSTEM_GetEndTime();
             elapsedTime += SYSTEM_GetProfileInfo();
-            SYSTEM_1Print("Time taken to exchange messages 
-                and compute the result: %d uSec\n", elapsedTime);
+            SYSTEM_1Print("Time taken to exchange messages and compute the result: %d uSec\n", elapsedTime);
         }
 #endif
 

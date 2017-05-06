@@ -53,11 +53,9 @@ extern "C"
     typedef struct ControlMsg
     {
         MSGQ_MsgHeader header;
-        Uint16      command;
-        // Char8 arg1[ARG1_SIZE];
-        int         arg1;
-        Uint16      arg2[ARG2_SIZE][ARG2_SIZE];
-        //Uint32 arg2;
+        Uint16  command;
+        int     arg1;                           // Cycles timer from DSP
+        Uint16  arg2[ARG2_SIZE][ARG2_SIZE];     // Matrix
     } ControlMsg;
 
     /* Messaging buffer used by the application.
@@ -114,15 +112,6 @@ extern "C"
 
     /* Extern declaration to the default DSP/BIOS LINK configuration structure. */
     extern LINKCFG_Object LINKCFG_config;
-
-
-    /* Matrices */
-    //Uint16 mat1[ARG2_SIZE][ARG2_SIZE];
-    //Uint16 mat2[ARG2_SIZE][ARG2_SIZE];
-
-    // extern Uint32 startUsecTime;
-    // extern Uint32 endUsecTime;
-
 
 #if defined (VERIFY_DATA)
     /** ============================================================================
@@ -276,99 +265,111 @@ extern "C"
         Uint32 i;
         Uint16 j, k;
         ControlMsg *msg;
+
+        /* Pointer to a matrix */
         Uint16 (*matrixpt)[ARG2_SIZE];
 
-        Uint32 actualTime = 0;
-
-        // Timers
-        // double actualTime;
-        // Timer totalTime, mat1Time, mat2Time, printTime;
-        // initTimer(&totalTime, "Total Time");
-        // initTimer(&mat1Time, "Mat1 Time");
-        // initTimer(&mat2Time, "Mat2 Time");
-        // initTimer(&printTime, "Print Time");
+        /* Variable to store result from the timer */
+        Uint32 elapsedTime = 0;
 
         SYSTEM_0Print("Entered helloDSP_Execute ()\n");
 
-        // startTimer(&totalTime);
-/*
-        for (j = 0; j < matrixSize; j++)
-            for (k = 0; k < matrixSize; k++)
-                mat1[j][k] = j+k*2;
-
-        for (j = 0; j < matrixSize; j++)
-            for (k = 0; k < matrixSize; k++)
-                mat2[j][k] = j+k*3;
-*/
-
+        /* Start the timer */
 #if defined (PROFILE)
         SYSTEM_GetStartTime();
 #endif
 
+        /** 
+         * 3 messages are received from the DSP:
+         *     - first response after the DSP becomes active;
+         *     - acknowledgement after sending the first matrix;
+         *     - result of the matrix multiplication.
+         */
         for (i = 0; ( (i < 3) && (DSP_SUCCEEDED (status)) ); i++)
         {
-            // receive the message
+            /* Receive the message. */
             status = MSGQ_get(SampleGppMsgq, WAIT_FOREVER, (MsgqMsg *) &msg);
-            SYSTEM_1Print("Received message with command %d\n", msg->command);
+            SYSTEM_0Print("received message!!!\n");
             if (DSP_FAILED(status))
+            {
                 SYSTEM_1Print("MSGQ_get () failed. Status = [0x%x]\n", status);
-
+            }
 #if defined (VERIFY_DATA)
             /* Verify correctness of data received. */
             if (DSP_SUCCEEDED(status))
             {
                 status = helloDSP_VerifyData(msg, sequenceNumber);
                 if (DSP_FAILED(status))
+                {
                     MSGQ_free((MsgqMsg) msg);
+                }
             }
 #endif
-            // input matrices generation
+            
             matrixpt = msg->arg2;
-            msg->command = 0x02;
-            if (i == 0)
-            {
+
+            /* Generating the first matrix */
+            if (i == 0) {
+
+                /* Matrix generation is not accunted in the elapsed time */
 #if defined (PROFILE)
-        // SYSTEM_GetEndTime();
-        actualTime += SYSTEM_GetEndTime();
+                SYSTEM_GetEndTime();
+                elapsedTime += SYSTEM_GetProfileInfo();
 #endif
-                // startTimer(&mat1Time);
                 for (j = 0; j < matrixSize; j++)
                     for (k = 0; k < matrixSize; k++)
                         matrixpt[j][k] = j+k*2;
-                // stopTimer(&mat1Time);
+            
+                /* Start the timer again */
 #if defined (PROFILE)
-        SYSTEM_GetStartTime();
-#endif
-            }
-            else if (i == 1)
-            {
-#if defined (PROFILE)
-        actualTime += SYSTEM_GetEndTime();
-#endif
-                // startTimer(&mat2Time);
-                for (j = 0; j < matrixSize; j++)
-                    for (k = 0; k < matrixSize; k++)
-                        matrixpt[j][k] = j+k*3;
-                // stopTimer(&mat2Time);
-#if defined (PROFILE)
-        SYSTEM_GetStartTime();
+                SYSTEM_GetStartTime();
 #endif
             }
 
-            // if the message received is the final one,
-            // print the result and free the message
+            /* Generating the second matrix */
+            else if (i == 1) {
+
+                /* Matrix generation is not accunted in the elapsed time */
+#if defined (PROFILE)
+                SYSTEM_GetEndTime();
+                elapsedTime += SYSTEM_GetProfileInfo();
+#endif
+                for (j = 0; j < matrixSize; j++)
+                    for (k = 0; k < matrixSize; k++)
+                        matrixpt[j][k] = j+k*3;
+
+                /* Start the timer again */
+#if defined (PROFILE)
+                SYSTEM_GetStartTime();
+#endif
+            }
+
+            /* If the message received is the final one,
+             * print the result and free the message. */
             if (i == 2) {
-                //for (j = 0; j < matrixSize; j++) {
-                //    SYSTEM_0Print("\n");
-                //    for (k = 0; k < matrixSize; k++)
-                //        SYSTEM_1Print("\t%d ", matrixpt[j][k]);
-                //}
-                SYSTEM_1Print("\n\nCycles spent on multiplication: %d\n\n", (int) msg->arg1);
+
+                /* Printing of the result is not accounted in the elapsed time */
+#if defined (PROFILE)
+                SYSTEM_GetEndTime();
+                elapsedTime += SYSTEM_GetProfileInfo();
+#endif
+                for (j=0; j<matrixSize; j++) {
+                    SYSTEM_0Print("\n");
+                    for (k=0; k<matrixSize; k++)
+                        SYSTEM_1Print("\t%d ", matrixpt[j][k]);
+                }
+                SYSTEM_0Print("\n");
+                SYSTEM_1Print("Cycles spent on multiplication: %d\n", msg->arg1);
+
+                /* Start the timer again */
+#if defined (PROFILE)
+                SYSTEM_GetStartTime();
+#endif
                 MSGQ_free((MsgqMsg) msg);
             }
             else
             {
-                // send the message containing the input matrices
+                /* Send the same message received in earlier MSGQ_get () call. */
                 if (DSP_SUCCEEDED(status))
                 {
                     msgId = MSGQ_getMsgId(msg);
@@ -385,26 +386,22 @@ extern "C"
                 /* Make sure that the sequenceNumber stays within the permitted
                  * range for applications. */
                 if (sequenceNumber == MSGQ_INTERNALIDSSTART)
+                {
                     sequenceNumber = 0;
+                }
 
-#if !defined (PROFILE)
-                if (DSP_SUCCEEDED(status) && ((i % 100) == 0))
-                    SYSTEM_1Print("Transferred %ld messages\n", i);
-#endif
             }
         }
 
 #if defined (PROFILE)
         if (DSP_SUCCEEDED(status))
         {
-            actualTime += SYSTEM_GetEndTime();
-            // SYSTEM_GetProfileInfo(matrixSize);
+            SYSTEM_GetEndTime();
+            elapsedTime += SYSTEM_GetProfileInfo();
+            SYSTEM_1Print("Time taken to exchange messages 
+                and compute the result: %d uSec\n", elapsedTime);
         }
 #endif
-
-        // stopTimer(&totalTime);
-        // actualTime = totalTime.elapsedTime - mat1Time.elapsedTime - mat2Time.elapsedTime;
-        SYSTEM_1Print("Actual time = %d\n", actualTime);
 
         SYSTEM_0Print("Leaving helloDSP_Execute ()\n");
 
@@ -520,10 +517,10 @@ extern "C"
         {
             matrixSize = SYSTEM_Atoi(strMatrixSize);
 
-            if (matrixSize > ARG2_SIZE)
+            if (matrixSize > 0xFFFF)
             {
                 status = DSP_EINVALIDARG;
-                SYSTEM_1Print("ERROR! Invalid arguments specified for helloDSP application.\n Max matrix size = %d\n", ARG2_SIZE);
+                SYSTEM_1Print("ERROR! Invalid arguments specified for helloDSP application.\n Max iterations = %d\n", 0xFFFF);
             }
             else
             {
@@ -541,7 +538,9 @@ extern "C"
 
                     /* Execute the message execute phase. */
                     if (DSP_SUCCEEDED(status))
+                    {
                         status = helloDSP_Execute(matrixSize, processorId);
+                    }
 
                     /* Perform cleanup operation. */
                     helloDSP_Delete(processorId);

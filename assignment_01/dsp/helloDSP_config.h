@@ -48,14 +48,12 @@ extern "C" {
 
 /* Control message data structure. */
 /* Must contain a reserved space for the header */
-typedef struct ControlMsg 
+typedef struct ControlMsg
 {
-    MSGQ_MsgHeader 	header;
-    Uint16 			command;
-    // Char 			arg1[ARG1_SIZE];
-    int 			arg1;
-    Uint16 			arg2[ARG2_SIZE][ARG2_SIZE];
-    //Uint32 arg2;
+    MSGQ_MsgHeader header;
+    Uint16  command;
+    int     arg1;                           // Cycles timer from DSP
+    Uint16  arg2[ARG2_SIZE][ARG2_SIZE];     // Matrix
 } ControlMsg;
 
 /* Messaging buffer used by the application.

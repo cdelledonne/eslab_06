@@ -236,7 +236,7 @@ extern "C"
      *  @modif  endUsecTime
      *  ============================================================================
      */
-    NORMAL_API Uint32 SYSTEM_GetEndTime(Void)
+    NORMAL_API Void SYSTEM_GetEndTime(Void)
     {
         DSP_STATUS status = DSP_SOK;
         Int32 osStatus = 0;
@@ -252,21 +252,22 @@ extern "C"
         {
             endUsecTime = (((currentTime.tv_sec - initialUsecTime.tv_sec) * 1000000) + (currentTime.tv_usec - initialUsecTime.tv_usec));
         }
-        return endUsecTime;
     }
 
     /** ============================================================================
      *  @func   SYSTEM_GetProfileInfo
      *
-     *  @desc   It converts a time variable to elapsed time structure.
+     *  @desc   Computes the time takes by the piece of code wrapped between
+     *          SYSTEM_GetStartTime() and SYSTEM_GetEndTime.
+     *
+     *  @ret    Elapsed time
      *
      *  @modif  None
      *  ============================================================================
      */
-    NORMAL_API
-    Void
-    SYSTEM_GetProfileInfo(Uint32 matrixSize)
+    NORMAL_API Uint32 SYSTEM_GetProfileInfo(Void)
     {
+    /*    
         Real32 roundTripTime = 0;
         Uint32 usecTimeTaken = 0;
         Real32 numSeconds = 0;
@@ -274,19 +275,21 @@ extern "C"
         usecTimeTaken = (endUsecTime - startUsecTime);
         if (usecTimeTaken != 0)
         {
-            roundTripTime = (Real32)((Real32)(usecTimeTaken) / (Real32)(matrixSize));
+            roundTripTime = (Real32)((Real32)(usecTimeTaken) / (Real32)(numIterations));
         }
 
-        /* To calculate number of seconds in usecTimeTaken */
+        // To calculate number of seconds in usecTimeTaken
         numSeconds = (Real32)((Real32) usecTimeTaken / 1000000.0);
 
-        SYSTEM_0Print("Generating two matrices and computing the product matrix took\n");
+        SYSTEM_1Print("Transferring %d iterations took ", numIterations);
         SYSTEM_1Print("%d seconds ", numSeconds);
         SYSTEM_1Print("%d microseconds.\n", (Real32)(usecTimeTaken % 1000000));
 
         SYSTEM_1Print("RoundTrip Time for 1 message is %d microseconds.\n", roundTripTime);
 
         return;
+    */
+        return (endUsecTime - startUsecTime);
     }
 
 #endif /* if defined (PROFILE) */

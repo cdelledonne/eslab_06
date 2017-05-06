@@ -62,7 +62,7 @@ extern "C"
      *  @desc   This function implements the execute phase for this application.
      *
      *  @arg    matrixSize
-     *              Number of times to send the message to the DSP.
+     *              Matrix size.
      *
      *  @arg    processorId
      *             Id of the DSP Processor.
@@ -118,7 +118,7 @@ extern "C"
      *  @arg    dspExecutable
      *              Name of the DSP executable file.
      *  @arg    strMatrixSize
-     *              Matrix size.
+     *              Matrix size in string format.
      *  @arg    strProcessorId
      *             Id of the DSP Processor in string format.
      *
@@ -145,7 +145,7 @@ extern "C"
      *  @arg    dspExecutable
      *              Name of the DSP executable file.
      *  @arg    strMatrixSize
-     *              Matrix size.
+     *              Matrix size in string format.
      *  @arg    strProcessorId
      *             Id of the DSP Processor in string format.
      *  @arg    strDspAddr

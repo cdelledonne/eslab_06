@@ -29,12 +29,9 @@ extern "C"
     int main (int argc, char** argv)
     {
         Char8* dspExecutable = NULL;
-        Char8* strMatrixSize = NULL;
+        Char8* strMatrixSize = NULL;    // take size of matrices as argument in the command line
         Char8* strProcessorId = NULL;
         Uint8 processorId = 0;
-
-        /*	long long _Fract value = atof("2.3");
-        	printf("%k\n",value);	*/
 
         if ((argc != 4) && (argc!=3))
         {

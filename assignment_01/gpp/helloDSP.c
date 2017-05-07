@@ -36,6 +36,9 @@ extern "C"
 #define ARG1_SIZE       256
 #define ARG2_SIZE       128
 
+    /* Verify multiplication correctness. */
+#define VERIF_MULT
+
     /* ID of the POOL used by helloDSP. */
 #define SAMPLE_POOL_ID  0
 
@@ -263,8 +266,15 @@ extern "C"
         Uint16 sequenceNumber = 0;
         Uint16 msgId = 0;
         Uint32 i;
-        Uint16 j, k;
+        Uint16 j, k, l;
         ControlMsg *msg;
+
+#if defined (VERIF_MULT)
+        Uint16 mat1[ARG2_SIZE][ARG2_SIZE], mat2[ARG2_SIZE][ARG2_SIZE], prod[ARG2_SIZE][ARG2_SIZE];
+
+        /* Flag to verify multiplication correctness */
+        Uint8 isMultCorrect;
+#endif
 
         /* Pointer to a matrix */
         Uint16 (*matrixpt)[ARG2_SIZE];
@@ -358,6 +368,42 @@ extern "C"
                     for (k=0; k<matrixSize; k++)
                         SYSTEM_1Print("\t%d ", matrixpt[j][k]);
                 }
+
+#if defined (VERIF_MULT)
+                for (j = 0; j < matrixSize; j++)
+                    for (k = 0; k < matrixSize; k++)
+                        mat1[j][k] = j+k*2;
+
+                for (j = 0; j < matrixSize; j++)
+                    for (k = 0; k < matrixSize; k++)
+                        mat2[j][k] = j+k*3;
+
+                for (j = 0; j < matrixSize; j++)
+                    for (k = 0; k < matrixSize; k++)
+                    {
+                        prod[j][k] = 0;
+                        for(l = 0; l < matrixSize; l++)
+                            prod[j][k] = prod[j][k] + mat1[j][l] * mat2[l][k];
+                    }
+
+                isMultCorrect = 1;
+                for (j = 0; j < matrixSize; j++) {
+                    if (!isMultCorrect)
+                        break;
+                    for (k = 0; k < matrixSize; k++)
+                        if (prod[j][k] != matrixpt[j][k]) {
+                            isMultCorrect = 0;
+                            break;
+                        }
+                }
+
+                SYSTEM_0Print("\n\nMultiplication result has been verified and it is ");
+                if (isMultCorrect)
+                    SYSTEM_0Print("CORRECT");
+                else
+                    SYSTEM_0Print("NOT CORRECT");
+#endif
+
                 SYSTEM_0Print("\n\n");
                 SYSTEM_1Print("Cycles spent on multiplication: %d\n", msg->arg1);
 

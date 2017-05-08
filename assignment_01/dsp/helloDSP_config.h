@@ -48,18 +48,26 @@ extern "C" {
 
 /* Control message data structure. */
 /* Must contain a reserved space for the header */
-typedef struct ControlMsg
+typedef struct ControlMsgS
 {
     MSGQ_MsgHeader header;
     Uint16  command;
     int     arg1;                           // Cycles timer from DSP
-    Uint16  arg2[ARG2_SIZE][ARG2_SIZE];     // Matrix
-} ControlMsg;
+    Uint16  arg2[ARG2_SIZE][ARG2_SIZE];     // 128x128, 16-bit-element matrix
+} ControlMsgS;
+
+typedef struct ControlMsgL
+{
+    MSGQ_MsgHeader header;
+    Uint16  command;
+    int     arg1;                           // Cycles timer from DSP
+    Uint32  arg2[ARG2_SIZE/2][ARG2_SIZE];   // 64x128, 32-bit-element matrix
+} ControlMsgL;
 
 /* Messaging buffer used by the application.
  * Note: This buffer must be aligned according to the alignment expected
  * by the device/platform. */
-#define APP_BUFFER_SIZE DSPLINK_ALIGN (sizeof (ControlMsg), DSPLINK_BUF_ALIGN)
+#define APP_BUFFER_SIZE DSPLINK_ALIGN (sizeof (ControlMsgS), DSPLINK_BUF_ALIGN)
 
 /* Number of pools configured in the system. */
 #define NUM_POOLS          1

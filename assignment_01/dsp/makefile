@@ -166,8 +166,15 @@ DEFS := 	-DHOSTED_IO 				\
 		-DDSP_SWI_MODE                          \
 		-DARCH_OMAP                             
 
-
-
+#   ----------------------------------------------------------------------------
+#   Compiler options to use NEON
+#   ----------------------------------------------------------------------------
+NEON_CFLAGS := -march=armv7-a              \
+               -mtune=cortex-a8            \
+               -mfpu=neon                  \
+               -ftree-vectorize            \
+               -mfloat-abi=softfp          \
+               -funsafe-math-optimizations
 
 #   ----------------------------------------------------------------------------
 #   Linker common library search path

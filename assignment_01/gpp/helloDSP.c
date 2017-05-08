@@ -36,6 +36,9 @@ extern "C"
 #define ARG1_SIZE       256
 #define ARG2_SIZE       128
 
+    /* Verify multiplication correctness. */
+#define VERIF_MULT
+
     /* ID of the POOL used by helloDSP. */
 #define SAMPLE_POOL_ID  0
 
@@ -48,20 +51,28 @@ extern "C"
 #define NUMMSGINPOOL2   2
 #define NUMMSGINPOOL3   4
 
-    /* Control message data structure. */
-    /* Must contain a reserved space for the header */
-    typedef struct ControlMsg
-    {
-        MSGQ_MsgHeader header;
-        Uint16  command;
-        int     arg1;                           // Cycles timer from DSP
-        Uint16  arg2[ARG2_SIZE][ARG2_SIZE];     // Matrix
-    } ControlMsg;
+/* Control message data structure. */
+/* Must contain a reserved space for the header */
+typedef struct ControlMsgS
+{
+    MSGQ_MsgHeader header;
+    Uint16  command;
+    int     arg1;                           // Cycles timer from DSP
+    Uint16  arg2[ARG2_SIZE][ARG2_SIZE];     // 128x128, 16-bit-element matrix
+} ControlMsgS;
+
+typedef struct ControlMsgL
+{
+    MSGQ_MsgHeader header;
+    Uint16  command;
+    int     arg1;                           // Cycles timer from DSP
+    Uint32  arg2[ARG2_SIZE/2][ARG2_SIZE];   // 64x128, 32-bit-element matrix
+} ControlMsgL;
 
     /* Messaging buffer used by the application.
      * Note: This buffer must be aligned according to the alignment expected
      * by the device/platform. */
-#define APP_BUFFER_SIZE DSPLINK_ALIGN (sizeof (ControlMsg), DSPLINK_BUF_ALIGN)
+#define APP_BUFFER_SIZE DSPLINK_ALIGN (sizeof (ControlMsgS), DSPLINK_BUF_ALIGN)
 
     /* Definitions required for the sample Message queue.
      * Using a Zero-copy based transport on the shared memory physical link. */
@@ -120,7 +131,7 @@ extern "C"
      *  @desc   This function verifies the data-integrity of given message.
      *  ============================================================================
      */
-    STATIC NORMAL_API DSP_STATUS helloDSP_VerifyData(IN MSGQ_Msg msg, IN Uint16 sequenceNumber);
+    STATIC NORMAL_API DSP_STATUS helloDSP_VerifyData(IN MSGQ_Msg msgS, IN Uint16 sequenceNumber);
 #endif
 
 
@@ -262,16 +273,30 @@ extern "C"
         DSP_STATUS  status = DSP_SOK;
         Uint16 sequenceNumber = 0;
         Uint16 msgId = 0;
-        Uint32 i;
-        Uint16 j, k;
-        ControlMsg *msg;
+        Uint8 i;
+        Uint8 j, k, l;
+        /* Two different types of message (see struct typedef for more info) */
+        ControlMsgS *msgS;
+        ControlMsgL *msgL;
+
+        /* Variable to store product matrix from the DSP */
+        Uint32 resFromDSP[ARG2_SIZE][ARG2_SIZE];
 
         /* Pointer to a matrix */
-        Uint16 (*matrixpt)[ARG2_SIZE];
+        Uint16 (*matrixPtS)[ARG2_SIZE];
+        Uint32 (*matrixPtL)[ARG2_SIZE];
 
         /* Variable to store result from the timer */
         Uint32 elapsedTime = 0;
 
+#if defined (VERIF_MULT)
+        /* Matrices for verification purposes */
+        Uint16 mat1[ARG2_SIZE][ARG2_SIZE], mat2[ARG2_SIZE][ARG2_SIZE];
+        Uint32 prod[ARG2_SIZE][ARG2_SIZE];
+
+        /* Flag to verify multiplication correctness */
+        Uint8 isMultCorrect;
+#endif
         SYSTEM_0Print("Entered helloDSP_Execute ()\n");
 
         /* Start the timer */
@@ -280,16 +305,20 @@ extern "C"
 #endif
 
         /** 
-         * 3 messages are received from the DSP:
+         * 4 messages are received from the DSP:
          *     - first response after the DSP becomes active;
          *     - acknowledgement after sending the first matrix;
-         *     - result of the matrix multiplication.
+         *     - first half of result of the matrix multiplication;
+         *     - second half of result of the matrix multiplication.
          */
-        for (i = 0; ( (i < 3) && (DSP_SUCCEEDED (status)) ); i++)
+        for (i = 0; ( (i < 4) && (DSP_SUCCEEDED (status)) ); i++)
         {
-            /* Receive the message. */
-            status = MSGQ_get(SampleGppMsgq, WAIT_FOREVER, (MsgqMsg *) &msg);
-            SYSTEM_0Print("received message!!!\n");
+            /* Receive the messages. */
+            if (i < 2)
+                status = MSGQ_get(SampleGppMsgq, WAIT_FOREVER, (MsgqMsg *) &msgS);
+            else
+                status = MSGQ_get(SampleGppMsgq, WAIT_FOREVER, (MsgqMsg *) &msgL);
+
             if (DSP_FAILED(status))
             {
                 SYSTEM_1Print("MSGQ_get () failed. Status = [0x%x]\n", status);
@@ -298,17 +327,18 @@ extern "C"
             /* Verify correctness of data received. */
             if (DSP_SUCCEEDED(status))
             {
-                status = helloDSP_VerifyData(msg, sequenceNumber);
+                status = helloDSP_VerifyData(msgS, sequenceNumber);
                 if (DSP_FAILED(status))
                 {
-                    MSGQ_free((MsgqMsg) msg);
+                    MSGQ_free((MsgqMsg) msgS);
                 }
             }
 #endif
-            
-            matrixpt = msg->arg2;
+            /* Assign matrix pointers */
+            matrixPtS = msgS->arg2;
+            matrixPtL = msgL->arg2;
 
-            /* Generating the first matrix */
+            /* Generate the first matrix */
             if (i == 0) {
 
                 /* Matrix generation is not accunted in the elapsed time */
@@ -318,7 +348,7 @@ extern "C"
 #endif
                 for (j = 0; j < matrixSize; j++)
                     for (k = 0; k < matrixSize; k++)
-                        matrixpt[j][k] = j+k*2;
+                        matrixPtS[j][k] = j+k*2;
             
                 /* Start the timer again */
 #if defined (PROFILE)
@@ -326,17 +356,17 @@ extern "C"
 #endif
             }
 
-            /* Generating the second matrix */
+            /* Generate the second matrix */
             else if (i == 1) {
 
-                /* Matrix generation is not accunted in the elapsed time */
+                /* Matrix generation is not accounted in the elapsed time */
 #if defined (PROFILE)
                 SYSTEM_GetEndTime();
                 elapsedTime += SYSTEM_GetProfileInfo();
 #endif
                 for (j = 0; j < matrixSize; j++)
                     for (k = 0; k < matrixSize; k++)
-                        matrixpt[j][k] = j+k*3;
+                        matrixPtS[j][k] = j+k*3;
 
                 /* Start the timer again */
 #if defined (PROFILE)
@@ -344,40 +374,94 @@ extern "C"
 #endif
             }
 
-            /* If the message received is the final one,
-             * print the result and free the message. */
+            /* Store first half of the result */
             if (i == 2) {
+                for (j = 0; (j < matrixSize) && (j < ARG2_SIZE/2); j++) {
+                    for (k = 0; k < matrixSize; k++)
+                        resFromDSP[j][k] = matrixPtL[j][k];
+                }
+
+                msgId = MSGQ_getMsgId(msgS);
+                MSGQ_setMsgId(msgS, msgId);
+                status = MSGQ_put(SampleDspMsgq, (MsgqMsg) msgS);
+            }
+
+            /* Store second half of the result,
+             * print the result and free the message. */
+            else if (i == 3) {
+                for (j = ARG2_SIZE/2; j < matrixSize; j++) {
+                    for (k = 0; k < matrixSize; k++)
+                        resFromDSP[j][k] = matrixPtL[j-ARG2_SIZE/2][k];
+                }
 
                 /* Printing of the result is not accounted in the elapsed time */
 #if defined (PROFILE)
                 SYSTEM_GetEndTime();
                 elapsedTime += SYSTEM_GetProfileInfo();
 #endif
-                for (j=0; j<matrixSize; j++) {
+                for (j = 0; j < matrixSize; j++) {
                     SYSTEM_0Print("\n");
-                    for (k=0; k<matrixSize; k++)
-                        SYSTEM_1Print("\t%d ", matrixpt[j][k]);
+                    for (k = 0; k < matrixSize; k++)
+                        SYSTEM_1Print("\t%d ", resFromDSP[j][k]);
                 }
+
+#if defined (VERIF_MULT)
+                for (j = 0; j < matrixSize; j++)
+                    for (k = 0; k < matrixSize; k++)
+                        mat1[j][k] = j+k*2;
+
+                for (j = 0; j < matrixSize; j++)
+                    for (k = 0; k < matrixSize; k++)
+                        mat2[j][k] = j+k*3;
+
+                for (j = 0; j < matrixSize; j++)
+                    for (k = 0; k < matrixSize; k++)
+                    {
+                        prod[j][k] = 0;
+                        for(l = 0; l < matrixSize; l++)
+                            prod[j][k] = prod[j][k] + ((Uint32)mat1[j][l]) * ((Uint32)mat2[l][k]);
+                    }
+
+                isMultCorrect = 1;
+                for (j = 0; j < matrixSize; j++) {
+                    if (!isMultCorrect)
+                        break;
+                    for (k = 0; k < matrixSize; k++)
+                        if (prod[j][k] != resFromDSP[j][k]) {
+                            isMultCorrect = 0;
+                            break;
+                        }
+                }
+
+                SYSTEM_0Print("\n\nMultiplication result has been verified and it is ");
+                if (isMultCorrect)
+                    SYSTEM_0Print("CORRECT");
+                else
+                    SYSTEM_0Print("NOT CORRECT");
+#endif
+
                 SYSTEM_0Print("\n\n");
-                SYSTEM_1Print("Cycles spent on multiplication: %d\n", msg->arg1);
+                SYSTEM_1Print("Cycles spent on multiplication: %d\n", msgS->arg1);
 
                 /* Start the timer again */
 #if defined (PROFILE)
                 SYSTEM_GetStartTime();
 #endif
-                MSGQ_free((MsgqMsg) msg);
+                MSGQ_free((MsgqMsg) msgS);
             }
+
+            /* Send two input matrices */
             else
             {
                 /* Send the same message received in earlier MSGQ_get () call. */
                 if (DSP_SUCCEEDED(status))
                 {
-                    msgId = MSGQ_getMsgId(msg);
-                    MSGQ_setMsgId(msg, msgId);
-                    status = MSGQ_put(SampleDspMsgq, (MsgqMsg) msg);
+                    msgId = MSGQ_getMsgId(msgS);
+                    MSGQ_setMsgId(msgS, msgId);
+                    status = MSGQ_put(SampleDspMsgq, (MsgqMsg) msgS);
                     if (DSP_FAILED(status))
                     {
-                        MSGQ_free((MsgqMsg) msg);
+                        MSGQ_free((MsgqMsg) msgS);
                         SYSTEM_1Print("MSGQ_put () failed. Status = [0x%x]\n", status);
                     }
                 }
@@ -389,7 +473,6 @@ extern "C"
                 {
                     sequenceNumber = 0;
                 }
-
             }
         }
 
@@ -563,13 +646,13 @@ extern "C"
      *  @modif  None
      *  ============================================================================
      */
-    STATIC NORMAL_API DSP_STATUS helloDSP_VerifyData(IN MSGQ_Msg msg, IN Uint16 sequenceNumber)
+    STATIC NORMAL_API DSP_STATUS helloDSP_VerifyData(IN MSGQ_Msg msgS, IN Uint16 sequenceNumber)
     {
         DSP_STATUS status = DSP_SOK;
         Uint16 msgId;
 
         /* Verify the message */
-        msgId = MSGQ_getMsgId(msg.header);
+        msgId = MSGQ_getMsgId(msgS.header);
         if (msgId != sequenceNumber)
         {
             status = DSP_EFAIL;

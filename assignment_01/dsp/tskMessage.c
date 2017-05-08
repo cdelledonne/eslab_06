@@ -257,6 +257,7 @@ Int TSKMESSAGE_execute(TSKMESSAGE_TransferInfo* info)
                         /* Compute the product and time the computation */
                         TSCL = 0;
                         start = TSCL;
+			#pragma UNROLL(4)
                         for (j = 0; (j < matrixSize) && (j < MAXSIZE/2); j++)
                             for (k = 0; k < matrixSize; k++)
                             {

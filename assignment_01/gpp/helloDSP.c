@@ -314,7 +314,6 @@ extern "C"
                 }
             }
 #endif
-            
             matrixpt = msg->arg2;
 
             /* Generating the first matrix */

@@ -167,10 +167,6 @@ Int TSKMESSAGE_execute(TSKMESSAGE_TransferInfo* info)
         MSGQ_setSrcQueue((MSGQ_Msg) msg, info->localMsgq);
         msg->command = 0x01;
 
-        for (j=0; j<matrixSize; j++)
-            for (k=0; k<matrixSize; k++)
-                matrixpt[j][k] = 0;
-
         status = MSGQ_put(info->locatedMsgq, (MSGQ_Msg) msg);
         if (status != SYS_OK)
         {

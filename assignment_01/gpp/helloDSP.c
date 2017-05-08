@@ -299,7 +299,6 @@ extern "C"
         {
             /* Receive the message. */
             status = MSGQ_get(SampleGppMsgq, WAIT_FOREVER, (MsgqMsg *) &msg);
-            SYSTEM_0Print("received message!!!\n");
             if (DSP_FAILED(status))
             {
                 SYSTEM_1Print("MSGQ_get () failed. Status = [0x%x]\n", status);

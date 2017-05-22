@@ -22,8 +22,16 @@ void  MeanShift::Init_target_frame(const cv::Mat &frame,const cv::Rect &rect)
 
 float  MeanShift::Epanechnikov_kernel(cv::Mat &kernel)
 {
+
+
     int h = kernel.rows;
     int w = kernel.cols;
+    float l = h/2;
+    float m= w/2;
+    float n=l*l;
+    float o=m*m;
+
+    // h=58;; w=86
 
     float epanechnikov_cd = 0.1*PI*h*w;
     float kernel_sum = 0.0;
@@ -31,9 +39,9 @@ float  MeanShift::Epanechnikov_kernel(cv::Mat &kernel)
     {
         for(int j=0;j<w;j++)
         {
-            float x = static_cast<float>(i - h/2);
-            float  y = static_cast<float> (j - w/2);
-            float norm_x = x*x/(h*h/4)+y*y/(w*w/4);
+            float x = static_cast<float>(i - l);
+            float  y = static_cast<float> (j - m);
+            float norm_x = x*x/(n)+y*y/(o);
             float result =norm_x<1?(epanechnikov_cd*(1.0-norm_x)):0;
             kernel.at<float>(i,j) = result;
             kernel_sum += result;
@@ -60,6 +68,7 @@ cv::Mat MeanShift::pdf_representation(const cv::Mat &frame, const cv::Rect &rect
         for(int j=0;j<rect.width;j++)
         {
             curr_pixel_value = frame.at<cv::Vec3b>(row_index,clo_index);
+            //have to vecctorize this
             bin_value[0] = (curr_pixel_value[0]/bin_width);
             bin_value[1] = (curr_pixel_value[1]/bin_width);
             bin_value[2] = (curr_pixel_value[2]/bin_width);
@@ -83,8 +92,8 @@ cv::Mat MeanShift::CalWeight(const cv::Mat &frame, cv::Mat &target_model,
     int row_index = rec.y;
     int col_index = rec.x;
 
-    std::cout<<"RI"<<row_index<<"\n";
-    std::cout<<"CI"<<col_index<<"\n"; 
+    //std::cout<<"RI"<<row_index<<"\n";
+    //std::cout<<"CI"<<col_index<<"\n";
     // Number of rows=58 and cols=86
     cv::Mat weight(rows,cols,CV_32F,cv::Scalar(1.0000));
     std::vector<cv::Mat> bgr_planes;

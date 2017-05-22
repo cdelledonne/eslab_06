@@ -5,6 +5,7 @@
 
 #include"meanshift.h"
 #include <iostream>
+#include "arm_neon.h"
 
 MeanShift::MeanShift()
 {

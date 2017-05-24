@@ -15,8 +15,9 @@ CFLAGS=$(DEFS) $(INCLUDES)          \
 	  -Wall -O3 -Wfatal-errors 		\
 	  --sysroot=/opt/rootfs			\
       -mlittle-endian               \
-      -march=armv5t                 \
-      -mtune=arm9tdmi               \
+			-mcpu=cortex-a8               \
+      -march=armv7-a                 \
+      -mtune=cortex-a8               \
       -msoft-float                  \
       -Uarm                         \
       -marm                         \
@@ -27,6 +28,7 @@ CFLAGS=$(DEFS) $(INCLUDES)          \
       -mapcs                        \
       -mfloat-abi=softfp            \
       -mfpu=neon                    \
+			-funsafe-math-optimizations   \
       -mabi=aapcs-linux
 
 all: clean $(EXEC)
@@ -36,7 +38,7 @@ $(EXEC): $(OBJS)
 	$(CC) -o $@ $(OBJS) $(LIBS) $(LDFLAGS)
 
 %.o : %.cpp
-	$(CC) $(CFLAGS) -c $< -o $@ 
+	$(CC) $(CFLAGS) -c $< -o $@
 
 neon: CFLAGS=-O3 -march=armv7-a -mtune=cortex-a8 -mfpu=neon -ftree-vectorize -mfloat-abi=softfp -funsafe-math-optimizations
 neon: clean all

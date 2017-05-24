@@ -27,10 +27,15 @@ float  MeanShift::Epanechnikov_kernel(cv::Mat &kernel)
 
     int h = kernel.rows;
     int w = kernel.cols;
+
+    //int result = vget_lane_s32(maxR, 0);
+     //int result2 = vget_lane_s32(maxR, 1);
+    //std::cout<<result<<result2;
     float l = h/2;
     float m= w/2;
     float n=l*l;
     float o=m*m;
+    float32x2_t maxR = {l,m};
 
     // h=58;; w=86
 
@@ -40,9 +45,15 @@ float  MeanShift::Epanechnikov_kernel(cv::Mat &kernel)
     {
         for(int j=0;j<w;j++)
         {
-            float x = static_cast<float>(i - l);
-            float  y = static_cast<float> (j - m);
-            float norm_x = x*x/(n)+y*y/(o);
+            float32x2_t ij={i,j};
+            //float32x4_t alpha ={i,j,i,j+1};
+            //std::cout<<vgetq_lane_f32(alpha, 0)<<"\t"<<vgetq_lane_f32(alpha, 1)<<"\t"<<vgetq_lane_f32(alpha, 2)<<"\t"<<vgetq_lane_f32(alpha, 3)<<"\n";
+            float32x2_t xy= vsub_f32(ij,maxR);
+            //float x = static_cast<float>(i - l);
+            //float  y = static_cast<float> (j - m);
+            float32x2_t normi_x=vmul_f32(xy,xy);
+            float norm_x=vget_lane_f32(normi_x, 0)+vget_lane_f32(normi_x, 1);
+            //float norm_x = x*x/(n)+y*y/(o);
             float result =norm_x<1?(epanechnikov_cd*(1.0-norm_x)):0;
             kernel.at<float>(i,j) = result;
             kernel_sum += result;

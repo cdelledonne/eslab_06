@@ -33,9 +33,13 @@ float  MeanShift::Epanechnikov_kernel(cv::Mat &kernel)
     //std::cout<<result<<result2;
     float l = h/2;
     float m= w/2;
-    float n=l*l;
-    float o=m*m;
-    float32x2_t maxR = {l,m};
+    //float n=1/(l*l);
+    //float o=1/(m*m);
+    //float32x2_t maxR = {l,m};
+    //float32x2_t recep={n,o};
+    float32x4_t maxR = {l,m,m,m};
+    float32x4_t maxR2 = {m,m,m,m};
+    float norm_x[7];
 
     // h=58;; w=86
 
@@ -43,20 +47,33 @@ float  MeanShift::Epanechnikov_kernel(cv::Mat &kernel)
     float kernel_sum = 0.0;
     for(int i=0;i<h;i++)
     {
-        for(int j=0;j<w;j++)
+        for(int j=0;j<w-2;j+=7)
         {
-            float32x2_t ij={i,j};
-            //float32x4_t alpha ={i,j,i,j+1};
-            //std::cout<<vgetq_lane_f32(alpha, 0)<<"\t"<<vgetq_lane_f32(alpha, 1)<<"\t"<<vgetq_lane_f32(alpha, 2)<<"\t"<<vgetq_lane_f32(alpha, 3)<<"\n";
-            float32x2_t xy= vsub_f32(ij,maxR);
+            //float32x2_t ij={i,j};
+            float32x4_t alpha ={i,j,j+1,j+2};
+            float32x4_t alpha2={j+3,j+4,j+5,j+6};
+            //float32x2_t xy= vsub_f32(ij,maxR);
+            float32x4_t xyyy=vsubq_f32(alpha,maxR);
+            float32x4_t xyyy2=vsubq_f32(alpha2,maxR2);
             //float x = static_cast<float>(i - l);
             //float  y = static_cast<float> (j - m);
-            float32x2_t normi_x=vmul_f32(xy,xy);
-            float norm_x=vget_lane_f32(normi_x, 0)+vget_lane_f32(normi_x, 1);
+            //float32x2_t normi_x=vmul_f32(xy,xy);
+            float32x4_t normi_x=vmulq_f32(xyyy,xyyy);
+            float32x4_t normh_x=vmulq_f32(xyyy2,xyyy2);
+            norm_x[0]=vgetq_lane_f32(normi_x, 0)+vgetq_lane_f32(normi_x, 1);
+            norm_x[1]=vgetq_lane_f32(normi_x, 0)+vgetq_lane_f32(normi_x, 2);
+            norm_x[2]=vgetq_lane_f32(normi_x, 0)+vgetq_lane_f32(normi_x, 3);
+            norm_x[3]=vgetq_lane_f32(normi_x, 0)+vgetq_lane_f32(normh_x, 0);
+            norm_x[4]=vgetq_lane_f32(normi_x, 0)+vgetq_lane_f32(normh_x, 1);
+            norm_x[5]=vgetq_lane_f32(normi_x, 0)+vgetq_lane_f32(normh_x, 2);
+            norm_x[6]=vgetq_lane_f32(normi_x, 0)+vgetq_lane_f32(normh_x, 3);
             //float norm_x = x*x/(n)+y*y/(o);
-            float result =norm_x<1?(epanechnikov_cd*(1.0-norm_x)):0;
-            kernel.at<float>(i,j) = result;
+            for(int k=0;k<7;k++)
+            {
+            float result =norm_x[k]<1?(epanechnikov_cd*(1.0-norm_x[k])):0;
+            kernel.at<float>(i,j+k) = result;
             kernel_sum += result;
+          }
         }
     }
     return kernel_sum;

@@ -112,7 +112,7 @@ cv::Mat MeanShift::CalWeight(const std::vector<cv::Mat> &bgr_planes, cv::Mat &ta
 
     // Number of rows=58 and cols=86
     cv::Mat weight(rows,cols,CV_32F,cv::Scalar(1.0000));
-    
+
 
     for(int k = 0; k < 3;  k++)
     {
@@ -139,10 +139,11 @@ cv::Rect MeanShift::track(const cv::Mat &next_frame)
   std::vector<cv::Mat> bgr_planes;
   cv::split(next_frame, bgr_planes);
     cv::Rect next_rect;
+      cv::Mat target_candidate = pdf_representation(next_frame,target_Region);
    //Max iterations = 8
     for(int iter=0;iter<cfg.MaxIter;iter++)
     {
-        cv::Mat target_candidate = pdf_representation(next_frame,target_Region);
+
         cv::Mat weight = CalWeight(bgr_planes,target_model,target_candidate,target_Region);
 
         float delta_x = 0.0;
@@ -166,8 +167,8 @@ cv::Rect MeanShift::track(const cv::Mat &next_frame)
             {
 
 
-                float norm_i = static_cast<float>(i/centre)-1;
-                float norm_j = static_cast<float>(j/centre)-1;
+                float norm_i = static_cast<float>(i-centre)/centre;
+                float norm_j = static_cast<float>(j-centre)/centre;
                 mult = (norm_i*norm_i)+(norm_j*norm_j)>1.0?0.0:1.0;
                 delta_x += static_cast<float>(norm_j*weight.at<float>(i,j)*mult);
                 delta_y += static_cast<float>(norm_i*weight.at<float>(i,j)*mult);

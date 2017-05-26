@@ -29,6 +29,8 @@ CFLAGS=$(DEFS) $(INCLUDES)          \
       -mfloat-abi=softfp            \
       -mfpu=neon                    \
 			-funsafe-math-optimizations   \
+			-ftree-vectorize              \
+			-0time                         \
       -mabi=aapcs-linux
 
 all: clean $(EXEC)

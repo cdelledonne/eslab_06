@@ -7,6 +7,7 @@
 #include <iostream>
 #include "arm_neon.h"
 
+
 MeanShift::MeanShift()
 {
     cfg.MaxIter = 8;
@@ -27,16 +28,8 @@ float  MeanShift::Epanechnikov_kernel(cv::Mat &kernel)
 
     int h = kernel.rows;
     int w = kernel.cols;
-
-    //int result = vget_lane_s32(maxR, 0);
-     //int result2 = vget_lane_s32(maxR, 1);
-    //std::cout<<result<<result2;
     float l = h/2;
     float m= w/2;
-    //float n=1/(l*l);
-    //float o=1/(m*m);
-    //float32x2_t maxR = {l,m};
-    //float32x2_t recep={n,o};
     float32x4_t maxR = {l,m,m,m};
     float32x4_t maxR2 = {m,m,m,m};
     float norm_x[7];
@@ -49,15 +42,11 @@ float  MeanShift::Epanechnikov_kernel(cv::Mat &kernel)
     {
         for(int j=0;j<w-2;j+=7)
         {
-            //float32x2_t ij={i,j};
+
             float32x4_t alpha ={i,j,j+1,j+2};
             float32x4_t alpha2={j+3,j+4,j+5,j+6};
-            //float32x2_t xy= vsub_f32(ij,maxR);
             float32x4_t xyyy=vsubq_f32(alpha,maxR);
             float32x4_t xyyy2=vsubq_f32(alpha2,maxR2);
-            //float x = static_cast<float>(i - l);
-            //float  y = static_cast<float> (j - m);
-            //float32x2_t normi_x=vmul_f32(xy,xy);
             float32x4_t normi_x=vmulq_f32(xyyy,xyyy);
             float32x4_t normh_x=vmulq_f32(xyyy2,xyyy2);
             norm_x[0]=vgetq_lane_f32(normi_x, 0)+vgetq_lane_f32(normi_x, 1);
@@ -67,7 +56,6 @@ float  MeanShift::Epanechnikov_kernel(cv::Mat &kernel)
             norm_x[4]=vgetq_lane_f32(normi_x, 0)+vgetq_lane_f32(normh_x, 1);
             norm_x[5]=vgetq_lane_f32(normi_x, 0)+vgetq_lane_f32(normh_x, 2);
             norm_x[6]=vgetq_lane_f32(normi_x, 0)+vgetq_lane_f32(normh_x, 3);
-            //float norm_x = x*x/(n)+y*y/(o);
             for(int k=0;k<7;k++)
             {
             float result =norm_x[k]<1?(epanechnikov_cd*(1.0-norm_x[k])):0;
@@ -113,7 +101,7 @@ cv::Mat MeanShift::pdf_representation(const cv::Mat &frame, const cv::Rect &rect
 
 }
 
-cv::Mat MeanShift::CalWeight(const cv::Mat &frame, cv::Mat &target_model,
+cv::Mat MeanShift::CalWeight(const std::vector<cv::Mat> &bgr_planes, cv::Mat &target_model,
                     cv::Mat &target_candidate, cv::Rect &rec)
 {
     int rows = rec.height;
@@ -121,12 +109,10 @@ cv::Mat MeanShift::CalWeight(const cv::Mat &frame, cv::Mat &target_model,
     int row_index = rec.y;
     int col_index = rec.x;
 
-    //std::cout<<"RI"<<row_index<<"\n";
-    //std::cout<<"CI"<<col_index<<"\n";
+
     // Number of rows=58 and cols=86
     cv::Mat weight(rows,cols,CV_32F,cv::Scalar(1.0000));
-    std::vector<cv::Mat> bgr_planes;
-    cv::split(frame, bgr_planes);
+    
 
     for(int k = 0; k < 3;  k++)
     {
@@ -150,30 +136,39 @@ cv::Mat MeanShift::CalWeight(const cv::Mat &frame, cv::Mat &target_model,
 
 cv::Rect MeanShift::track(const cv::Mat &next_frame)
 {
+  std::vector<cv::Mat> bgr_planes;
+  cv::split(next_frame, bgr_planes);
     cv::Rect next_rect;
+   //Max iterations = 8
     for(int iter=0;iter<cfg.MaxIter;iter++)
     {
         cv::Mat target_candidate = pdf_representation(next_frame,target_Region);
-        cv::Mat weight = CalWeight(next_frame,target_model,target_candidate,target_Region);
+        cv::Mat weight = CalWeight(bgr_planes,target_model,target_candidate,target_Region);
 
         float delta_x = 0.0;
         float sum_wij = 0.0;
         float delta_y = 0.0;
         float centre = static_cast<float>((weight.rows-1)/2.0);
-        double mult = 0.0;
+
+        float mult = 0.0;
+        //float32x2_t mult1={3.0,9.0};
+        //size of double is 8
 
         next_rect.x = target_Region.x;
         next_rect.y = target_Region.y;
         next_rect.width = target_Region.width;
         next_rect.height = target_Region.height;
-
+       //std::cout<<next_rect.width<<"\t"<<next_rect.height<<"\n";
         for(int i=0;i<weight.rows;i++)
         {
+
             for(int j=0;j<weight.cols;j++)
             {
-                float norm_i = static_cast<float>(i-centre)/centre;
-                float norm_j = static_cast<float>(j-centre)/centre;
-                mult = pow(norm_i,2)+pow(norm_j,2)>1.0?0.0:1.0;
+
+
+                float norm_i = static_cast<float>(i/centre)-1;
+                float norm_j = static_cast<float>(j/centre)-1;
+                mult = (norm_i*norm_i)+(norm_j*norm_j)>1.0?0.0:1.0;
                 delta_x += static_cast<float>(norm_j*weight.at<float>(i,j)*mult);
                 delta_y += static_cast<float>(norm_i*weight.at<float>(i,j)*mult);
                 sum_wij += static_cast<float>(weight.at<float>(i,j)*mult);

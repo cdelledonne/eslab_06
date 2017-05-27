@@ -18,7 +18,6 @@ CFLAGS=$(DEFS) $(INCLUDES)          \
 			-mcpu=cortex-a8               \
       -march=armv7-a                 \
       -mtune=cortex-a8               \
-      -msoft-float                  \
       -Uarm                         \
       -marm                         \
       -Wno-trigraphs                \

@@ -58,8 +58,8 @@ cv::Mat MeanShift::pdf_representation(const cv::Mat &frame, const cv::Rect &rect
 
     cv::Mat pdf_model(8,16,CV_32F,cv::Scalar(1e-10));
 
-    cv::Vec3f curr_pixel_value;
-    cv::Vec3f bin_value;
+    cv::Vec3b curr_pixel_value;
+    cv::Vec3b bin_value;
 
     int row_index = rect.y;
     int clo_index = rect.x;
@@ -70,9 +70,9 @@ cv::Mat MeanShift::pdf_representation(const cv::Mat &frame, const cv::Rect &rect
         for(int j=0;j<rect.width;j++)
         {
             curr_pixel_value = frame.at<cv::Vec3b>(row_index,clo_index);
-            bin_value[0] = (curr_pixel_value[0]/bin_width);
-            bin_value[1] = (curr_pixel_value[1]/bin_width);
-            bin_value[2] = (curr_pixel_value[2]/bin_width);
+            bin_value[0] = (curr_pixel_value[0]>>4);
+            bin_value[1] = (curr_pixel_value[1]>>4);
+            bin_value[2] = (curr_pixel_value[2]>>4);
 
             // COLLAPSE 3 MULTIPLICATIONS INTO A SINGLE ONE
             pdf_model.at<float>(0,bin_value[0]) += kernel.at<float>(i,j)*normalized_C;
@@ -106,7 +106,12 @@ cv::Mat MeanShift::CalWeight(const cv::Mat &window, cv::Mat &target_model,
     ticksEnd = cv::getTickCount();
     splitCount += (ticksEnd - ticksStart);
     //std::cout << "split: " << (ticksEnd - ticksStart) << ", ";
-     float32x4_t bin_width1=vdupq_n_f32((1/bin_width));
+     //int32x4_t bin_width1=vdupq_n_f32(vshrq_n_);
+     //float32x4_t bin_width2=vdupq_n_f32(14.858);
+     //int32x4_t ishu= vcvtq_s32_f32(bin_width2);
+     //int hell=vgetq_lane_s32(ishu,0);
+     //std::cout<<hell<<"\n";
+
     ticksStart = cv::getTickCount();
 
 
@@ -118,39 +123,35 @@ cv::Mat MeanShift::CalWeight(const cv::Mat &window, cv::Mat &target_model,
             col_index = 0;
             for(int j=0;j<cols-2;j=j+6)
             {
-                float32x4_t curr_pixel={(bgr_planes[k].at<uchar>(row_index,col_index)),(bgr_planes[k].at<uchar>(row_index,col_index+1)),(bgr_planes[k].at<uchar>(row_index,col_index+2)),(bgr_planes[k].at<uchar>(row_index,col_index+3))};
-                //float32x4_t curr_pixel1={(bgr_planes[k].at<uchar>(row_index,col_index+4)),(bgr_planes[k].at<uchar>(row_index,col_index+5)),(bgr_planes[k].at<uchar>(row_index,col_index+6)),(bgr_planes[k].at<uchar>(row_index,col_index+7))};
-                float32x4_t curr_pixel1={(bgr_planes[k].at<uchar>(row_index,col_index+4)),(bgr_planes[k].at<uchar>(row_index,col_index+5)),0,0};
+                uint32x4_t curr_pixel={(bgr_planes[k].at<uchar>(row_index,col_index)),(bgr_planes[k].at<uchar>(row_index,col_index+1)),(bgr_planes[k].at<uchar>(row_index,col_index+2)),(bgr_planes[k].at<uchar>(row_index,col_index+3))};
+                uint32x4_t curr_pixel1={(bgr_planes[k].at<uchar>(row_index,col_index+4)),(bgr_planes[k].at<uchar>(row_index,col_index+5)),0,0};
+                uint32x4_t bin_value=vshrq_n_u32(curr_pixel,4);
+                uint32x4_t bin_value1=vshrq_n_u32(curr_pixel1,4);
 
-                float32x4_t bin_value=vmulq_f32(curr_pixel,bin_width1);
-                float32x4_t bin_value1=vmulq_f32(curr_pixel1,bin_width1);
+                float32x4_t target_m={target_model.at<float>(k,vgetq_lane_u32(bin_value,0)),target_model.at<float>(k, vgetq_lane_u32(bin_value,1)),target_model.at<float>(k, vgetq_lane_u32(bin_value,2)),target_model.at<float>(k, vgetq_lane_u32(bin_value,3))};
 
-                float32x4_t target_m={target_model.at<float>(k,vgetq_lane_f32(bin_value,0)),target_model.at<float>(k, vgetq_lane_f32(bin_value,1)),target_model.at<float>(k, vgetq_lane_f32(bin_value,2)),target_model.at<float>(k, vgetq_lane_f32(bin_value,3))};
-                //float32x4_t target_m1={target_model.at<float>(k,vgetq_lane_f32(bin_value1,0)),target_model.at<float>(k, vgetq_lane_f32(bin_value1,1)),target_model.at<float>(k, vgetq_lane_f32(bin_value1,2)),target_model.at<float>(k, vgetq_lane_f32(bin_value1,3))};
-                float32x4_t target_m1={target_model.at<float>(k,vgetq_lane_f32(bin_value1,0)),target_model.at<float>(k, vgetq_lane_f32(bin_value1,1)),1,1};
 
-                float32x4_t target_c={target_candidate.at<float>(k, vgetq_lane_f32(bin_value,0)),target_candidate.at<float>(k, vgetq_lane_f32(bin_value,1)),target_candidate.at<float>(k, vgetq_lane_f32(bin_value,2)),target_candidate.at<float>(k, vgetq_lane_f32(bin_value,3))};
-                //float32x4_t target_c1={target_candidate.at<float>(k, vgetq_lane_f32(bin_value1,0)),target_candidate.at<float>(k, vgetq_lane_f32(bin_value1,1)),target_candidate.at<float>(k, vgetq_lane_f32(bin_value1,2)),target_candidate.at<float>(k, vgetq_lane_f32(bin_value1,3))};
-                float32x4_t target_c1={target_candidate.at<float>(k, vgetq_lane_f32(bin_value1,0)),target_candidate.at<float>(k, vgetq_lane_f32(bin_value1,1)),1,1};
+                float32x4_t target_m1={target_model.at<float>(k,vgetq_lane_u32(bin_value1,0)),target_model.at<float>(k, vgetq_lane_u32(bin_value1,1)),1,1};
 
-                //float32x4_t inter=vrecpeq_f32(vrsqrteq_f32(target_m));
-                //float32x4_t napoli=vrecpeq_f32(vrsqrteq_f32(target_m1));
 
-                //float32x4_t milan=vmulq_f32(inter,vrsqrteq_f32(target_c));
-                //float32x4_t milan1=vmulq_f32(napoli,vrsqrteq_f32(target_c1));
+                float32x4_t target_c={target_candidate.at<float>(k, vgetq_lane_u32(bin_value,0)),target_candidate.at<float>(k, vgetq_lane_u32(bin_value,1)),target_candidate.at<float>(k, vgetq_lane_u32(bin_value,2)),target_candidate.at<float>(k, vgetq_lane_u32(bin_value,3))};
+
+
+                float32x4_t target_c1={target_candidate.at<float>(k, vgetq_lane_u32(bin_value1,0)),target_candidate.at<float>(k, vgetq_lane_u32(bin_value1,1)),1,1};
+
+
 
                 float32x4_t milan=vmulq_f32(target_m,vrecpeq_f32(target_c));
                 float32x4_t milan1=vmulq_f32(target_m1,vrecpeq_f32(target_c1));
+
+
 
                 float32x4_t weight1={weight.at<float>(i,j),weight.at<float>(i,j+1),weight.at<float>(i,j+2),weight.at<float>(i,j+3)};
                float32x4_t weight2={weight.at<float>(i,j+4),weight.at<float>(i,j+5),1,1};
 
                 float32x4_t weight4=vmulq_f32(weight1,milan);
                 float32x4_t weight5=vmulq_f32(weight2,milan1);
-                //int curr_pixel = (bgr_planes[k].at<uchar>(row_index,col_index));
-                //int bin_value = curr_pixel/bin_width;
-                // weight.at<float>(i,j) *= static_cast<float>((sqrt(target_model.at<float>(k, bin_value)/target_candidate.at<float>(k, bin_value))));
-                //weight.at<float>(i,j) *= static_cast<float>((target_model.at<float>(k, bin_value)/target_candidate.at<float>(k, bin_value)));
+                
                 weight.at<float>(i,j)   = vgetq_lane_f32(weight4,0);
                 weight.at<float>(i,j+1) = vgetq_lane_f32(weight4,1);
                 weight.at<float>(i,j+2) = vgetq_lane_f32(weight4,2);

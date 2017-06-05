@@ -121,23 +121,26 @@ cv::Mat MeanShift::CalWeight(const cv::Mat &window, cv::Mat &target_model,
         for(int i=0;i<rows;i++)
         {
             col_index = 0;
-            for(int j=0;j<cols-2;j=j+6)
+            for(int j=0;j<cols-6;j=j+8)
             {
-                uint32x4_t curr_pixel={(bgr_planes[k].at<uchar>(row_index,col_index)),(bgr_planes[k].at<uchar>(row_index,col_index+1)),(bgr_planes[k].at<uchar>(row_index,col_index+2)),(bgr_planes[k].at<uchar>(row_index,col_index+3))};
-                uint32x4_t curr_pixel1={(bgr_planes[k].at<uchar>(row_index,col_index+4)),(bgr_planes[k].at<uchar>(row_index,col_index+5)),0,0};
-                uint32x4_t bin_value=vshrq_n_u32(curr_pixel,4);
-                uint32x4_t bin_value1=vshrq_n_u32(curr_pixel1,4);
 
-                float32x4_t target_m={target_model.at<float>(k,vgetq_lane_u32(bin_value,0)),target_model.at<float>(k, vgetq_lane_u32(bin_value,1)),target_model.at<float>(k, vgetq_lane_u32(bin_value,2)),target_model.at<float>(k, vgetq_lane_u32(bin_value,3))};
+                uint16x8_t curr_pixel={(bgr_planes[k].at<uchar>(row_index,col_index)),(bgr_planes[k].at<uchar>(row_index,col_index+1)),(bgr_planes[k].at<uchar>(row_index,col_index+2)),(bgr_planes[k].at<uchar>(row_index,col_index+3)),(bgr_planes[k].at<uchar>(row_index,col_index+4)),(bgr_planes[k].at<uchar>(row_index,col_index+5)),
+                  (bgr_planes[k].at<uchar>(row_index,col_index+6)),(bgr_planes[k].at<uchar>(row_index,col_index+7))};
 
 
-                float32x4_t target_m1={target_model.at<float>(k,vgetq_lane_u32(bin_value1,0)),target_model.at<float>(k, vgetq_lane_u32(bin_value1,1)),1,1};
+                uint16x8_t bin_value=vshrq_n_u16(curr_pixel,4);
 
 
-                float32x4_t target_c={target_candidate.at<float>(k, vgetq_lane_u32(bin_value,0)),target_candidate.at<float>(k, vgetq_lane_u32(bin_value,1)),target_candidate.at<float>(k, vgetq_lane_u32(bin_value,2)),target_candidate.at<float>(k, vgetq_lane_u32(bin_value,3))};
+                float32x4_t target_m={target_model.at<float>(k,vgetq_lane_u16(bin_value,0)),target_model.at<float>(k, vgetq_lane_u16(bin_value,1)),target_model.at<float>(k, vgetq_lane_u16(bin_value,2)),target_model.at<float>(k, vgetq_lane_u16(bin_value,3))};
 
 
-                float32x4_t target_c1={target_candidate.at<float>(k, vgetq_lane_u32(bin_value1,0)),target_candidate.at<float>(k, vgetq_lane_u32(bin_value1,1)),1,1};
+                float32x4_t target_m1={target_model.at<float>(k,vgetq_lane_u16(bin_value,4)),target_model.at<float>(k, vgetq_lane_u16(bin_value,5)),target_model.at<float>(k, vgetq_lane_u16(bin_value,6)),target_model.at<float>(k, vgetq_lane_u16(bin_value,7))};
+
+
+                float32x4_t target_c={target_candidate.at<float>(k, vgetq_lane_u16(bin_value,0)),target_candidate.at<float>(k, vgetq_lane_u16(bin_value,1)),target_candidate.at<float>(k, vgetq_lane_u16(bin_value,2)),target_candidate.at<float>(k, vgetq_lane_u16(bin_value,3))};
+
+
+                float32x4_t target_c1={target_candidate.at<float>(k, vgetq_lane_u16(bin_value,4)),target_candidate.at<float>(k, vgetq_lane_u16(bin_value,5)),target_candidate.at<float>(k, vgetq_lane_u16(bin_value,6)),target_candidate.at<float>(k, vgetq_lane_u16(bin_value,7))};
 
 
 
@@ -146,23 +149,28 @@ cv::Mat MeanShift::CalWeight(const cv::Mat &window, cv::Mat &target_model,
 
 
 
-                float32x4_t weight1={weight.at<float>(i,j),weight.at<float>(i,j+1),weight.at<float>(i,j+2),weight.at<float>(i,j+3)};
-               float32x4_t weight2={weight.at<float>(i,j+4),weight.at<float>(i,j+5),1,1};
+              float32x4_t weight1={weight.at<float>(i,j),weight.at<float>(i,j+1),weight.at<float>(i,j+2),weight.at<float>(i,j+3)};
+               float32x4_t weight2={weight.at<float>(i,j+4),weight.at<float>(i,j+5),weight.at<float>(i,j+6),weight.at<float>(i,j+7)};
 
                 float32x4_t weight4=vmulq_f32(weight1,milan);
                 float32x4_t weight5=vmulq_f32(weight2,milan1);
-                
+
+
+
+
                 weight.at<float>(i,j)   = vgetq_lane_f32(weight4,0);
                 weight.at<float>(i,j+1) = vgetq_lane_f32(weight4,1);
                 weight.at<float>(i,j+2) = vgetq_lane_f32(weight4,2);
                 weight.at<float>(i,j+3) = vgetq_lane_f32(weight4,3);
                 weight.at<float>(i,j+4) = vgetq_lane_f32(weight5,0);
                 weight.at<float>(i,j+5) = vgetq_lane_f32(weight5,1);
-                //weight.at<float>(i,j+6) *= vgetq_lane_f32(milan1,2);
-                //weight.at<float>(i,j+7) *= vgetq_lane_f32(milan1,3);
+                weight.at<float>(i,j+6) = vgetq_lane_f32(weight5,2);
+                weight.at<float>(i,j+7) = vgetq_lane_f32(weight5,3);
+                
 
 
-                col_index+=6;
+
+                col_index+=8;
             }
             row_index++;
         }
@@ -309,8 +317,8 @@ cv::Rect MeanShift::track(const cv::Mat &next_frame)
 
         ticksStart = cv::getTickCount();
 
-        next_rect.x += static_cast<int>((delta_x/sum_wij)*centre);
-        next_rect.y += static_cast<int>((delta_y/sum_wij)*centre);
+        next_rect.x += static_cast<float>((delta_x/sum_wij)*centre);
+        next_rect.y += static_cast<float>((delta_y/sum_wij)*centre);
 
         if(abs(next_rect.x-target_Region.x)<1 && abs(next_rect.y-target_Region.y)<1)
         {

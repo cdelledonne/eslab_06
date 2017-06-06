@@ -1,8 +1,18 @@
 #if !defined (pool_notify_H)
 #define pool_notify_H
 
-/*  ----------------------------------- DSP/BIOS Link                 */
+#include <semaphore.h>
+/* ------------------------------------ DSP/BIOS Link ----------------------- */
 #include <dsplink.h>
+
+/* ------------------------------------ DSP/BIOS LINK API ------------------- */
+#include <proc.h>
+#include <pool.h>
+#include <mpcs.h>
+#include <notify.h>
+#if defined (DA8XXGEM)
+#include <loaderdefs.h>
+#endif
 
 
 #if defined (__cplusplus)
@@ -50,9 +60,7 @@ extern "C" {
  */
 NORMAL_API
 DSP_STATUS
-pool_notify_Create (IN Char8 * dspExecutable,
-                    IN Char8 * strBufferSize,
-                    IN Uint8   processorId) ;
+pool_notify_Create(IN Char8 * dspExecutable, IN Char8 * strBufferSize, IN Uint8 processorId);
 
 
 /** ============================================================================
@@ -79,7 +87,7 @@ pool_notify_Create (IN Char8 * dspExecutable,
  */
 NORMAL_API
 DSP_STATUS
-pool_notify_Execute (IN Uint32 numIterations, IN Uint8 processorId) ;
+pool_notify_Execute(IN Uint8 processorId);
 
 
 /** ============================================================================
@@ -108,7 +116,7 @@ pool_notify_Execute (IN Uint32 numIterations, IN Uint8 processorId) ;
  */
 NORMAL_API
 Void
-pool_notify_Delete (IN Uint8 processorId) ;
+pool_notify_Delete(IN Uint8 processorId);
 
 
 /** ============================================================================
@@ -138,8 +146,7 @@ pool_notify_Delete (IN Uint8 processorId) ;
  */
 NORMAL_API
 Void
-pool_notify_Main (IN Char8 * dspExecutable,
-               IN Char8 * strBufferSize) ;
+pool_notify_Init(IN Char8 * dspExecutable, IN Char8 * strBufferSize);
 
 
 #endif /* !defined (pool_notify_H) */

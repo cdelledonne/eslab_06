@@ -3,6 +3,7 @@
  * you can find all the formula in the paper
  */
 
+#include "pool_notify.h"
 #include "meanshift.h"
 
 MeanShift::MeanShift()
@@ -178,8 +179,6 @@ cv::Rect MeanShift::track(const cv::Mat &next_frame, const cv::Mat &mult)
 {
     cv::Mat curr_window;
 
-    // std::cout << "Frame: " << count << std::endl;
-
 #ifdef TIMING
     int64_t ticksStart, ticksEnd;
     ticksStart = cv::getTickCount();
@@ -190,8 +189,12 @@ cv::Rect MeanShift::track(const cv::Mat &next_frame, const cv::Mat &mult)
 #ifdef TIMING
     ticksEnd = cv::getTickCount();
     pdfCount += (ticksEnd - ticksStart);
-    // std::cout << "pdf: " << (ticksEnd - ticksStart) << std::endl;
 #endif
+
+    static int count = 0;
+    if (!count)
+        pool_notify_Execute(0);
+    count++;
 
     float centre = static_cast<float>((mult.rows-1)/2);
     float icentre = static_cast<float>(2.0/(mult.rows-1));
@@ -212,7 +215,6 @@ cv::Rect MeanShift::track(const cv::Mat &next_frame, const cv::Mat &mult)
 #ifdef TIMING
         ticksEnd = cv::getTickCount();
         weightCount += (ticksEnd - ticksStart);
-        // std::cout << "CalWeight: " << (ticksEnd - ticksStart) << ", ";
 #endif
 
         float delta_x = 0.0;
@@ -238,7 +240,6 @@ cv::Rect MeanShift::track(const cv::Mat &next_frame, const cv::Mat &mult)
                     delta_x += static_cast<float>(norm_j*weight.at<float>(i,j));
                     delta_y += static_cast<float>(norm_i*weight.at<float>(i,j));
                     sum_wij += static_cast<float>(weight.at<float>(i,j));
-                    // std::cout << "delta_x: " << delta_x << std::endl;
                 }
                 norm_j += icentre;
             }
@@ -248,12 +249,10 @@ cv::Rect MeanShift::track(const cv::Mat &next_frame, const cv::Mat &mult)
 #ifdef TIMING
         ticksEnd = cv::getTickCount();
         loopCount += (ticksEnd - ticksStart);
-        // std::cout << "loop: " << (ticksEnd - ticksStart) << ", ";
 #endif
 
         next_rect.x += static_cast<int>((delta_x/sum_wij)*centre);
         next_rect.y += static_cast<int>((delta_y/sum_wij)*centre);
-        // std::cout << "x = " << next_rect.x << ", y = " << next_rect.y << std::endl;
 
         if(abs(next_rect.x-target_Region.x)<1 && abs(next_rect.y-target_Region.y)<1)
             break;

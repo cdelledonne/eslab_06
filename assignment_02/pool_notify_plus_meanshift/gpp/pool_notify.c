@@ -1,22 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <semaphore.h>
-/*  ----------------------------------- DSP/BIOS Link                   */
-#include <dsplink.h>
-
-/*  ----------------------------------- DSP/BIOS LINK API               */
-#include <proc.h>
-#include <pool.h>
-#include <mpcs.h>
-#include <notify.h>
-#if defined (DA8XXGEM)
-#include <loaderdefs.h>
-#endif
-
-
-/*  ----------------------------------- Application Header              */
-#include <pool_notify.h>
+#include "pool_notify.h"
 //#include <pool_notify_os.h>
 
 
@@ -89,15 +74,7 @@ extern "C" {
  *  @desc   Size of buffer to be used for data transfer.
  *  ============================================================================
  */
-STATIC Uint32  pool_notify_BufferSize ;
-
-/*  ============================================================================
- *  @name   pool_notify_NumIterations
- *
- *  @desc   Number of iterations of data transfer.
- *  ============================================================================
- */
-STATIC Uint32  pool_notify_NumIterations ;
+STATIC Uint32  pool_notify_BufferSize;
 
 /** ============================================================================
  *  @name   pool_notify_DataBuf
@@ -106,7 +83,7 @@ STATIC Uint32  pool_notify_NumIterations ;
  *          application.
  *  ============================================================================
  */
-Uint16 * pool_notify_DataBuf = NULL ;
+Uint16 * pool_notify_DataBuf = NULL;
 
 
 /** ============================================================================
@@ -148,9 +125,9 @@ sem_t sem;
  *  @modif  None
  *  ============================================================================
  */
-NORMAL_API DSP_STATUS pool_notify_Create (	IN Char8 * dspExecutable,
-											IN Char8 * strBufferSize,
-											IN Uint8   processorId)
+NORMAL_API DSP_STATUS pool_notify_Create(IN Char8 * dspExecutable,
+										 IN Char8 * strBufferSize,
+										 IN Uint8   processorId)
 {
     DSP_STATUS      status     = DSP_SOK  ;
     Uint32          numArgs    = NUM_ARGS ;
@@ -364,7 +341,7 @@ int sum_dsp(unsigned char* buf, int length)
  *  @modif  None
  *  ============================================================================
  */
-NORMAL_API DSP_STATUS pool_notify_Execute (IN Uint32 numIterations, Uint8 processorId)
+NORMAL_API DSP_STATUS pool_notify_Execute (Uint8 processorId)
 {
     DSP_STATUS  status    = DSP_SOK ;
 
@@ -504,58 +481,27 @@ NORMAL_API Void pool_notify_Delete (Uint8 processorId)
  *  @modif  None
  *  ============================================================================
  */
-NORMAL_API Void pool_notify_Main (IN Char8 * dspExecutable, IN Char8 * strBufferSize)
+NORMAL_API Void pool_notify_Init (IN Char8 * dspExecutable, IN Char8 * strBufferSize)
 {
-    DSP_STATUS status       = DSP_SOK ;
-    Uint8      processorId  = 0 ;
+    DSP_STATUS status = DSP_SOK ;
+    Uint8 processorId = 0 ;
+
+    pool_notify_BufferSize = DSPLINK_ALIGN(atoi(strBufferSize), DSPLINK_BUF_ALIGN);
 
 	#ifdef DEBUG
-    printf ("========== Sample Application : pool_notify ==========\n") ;
+    printf("Allocated a buffer of %d bytes\n", (int)pool_notify_BufferSize);
 	#endif
 
-    if (   (dspExecutable != NULL) && (strBufferSize != NULL)   ) 
-	{
-        /*
-         *  Validate the buffer size and number of iterations specified.
-         */
-        pool_notify_BufferSize = DSPLINK_ALIGN ( atoi (strBufferSize),
-                                             DSPLINK_BUF_ALIGN) ;
-		#ifdef DEBUG
-        printf(" Allocated a buffer of %d bytes\n",(int)pool_notify_BufferSize );
-		#endif
-		
-        processorId = 0 ;
-        if (pool_notify_BufferSize == 0) 
-		{
-            status = DSP_EINVALIDARG ;
-            printf ("ERROR! Invalid arguments specified for  ");
-            printf ("     Buffer size    = %d\n", (int)pool_notify_BufferSize) ;
-        }
+    /*
+     *  Specify the dsp executable file name and the buffer size for
+     *  pool_notify creation phase.
+     */
+    status = pool_notify_Create(dspExecutable, strBufferSize, processorId);
 
-        /*
-         *  Specify the dsp executable file name and the buffer size for
-         *  pool_notify creation phase.
-         */
-        status = pool_notify_Create (dspExecutable,
-                                     strBufferSize,
-                                     0) ;
-
-        if (DSP_SUCCEEDED (status)) 
-		{
-            status = pool_notify_Execute (pool_notify_NumIterations, 0) ;
-        }
-
-         pool_notify_Delete (processorId) ;
-        
-    }
-    else 
-	{
-        status = DSP_EINVALIDARG ;
-        printf ("ERROR! Invalid arguments specified for  "
-                         "pool_notify application\n") ;
-    }
-
-    printf ("====================================================\n") ;
+    // if (DSP_SUCCEEDED (status)) 
+	// {
+    //     status = pool_notify_Execute(0);
+    // }
 }
 
 /** ----------------------------------------------------------------------------

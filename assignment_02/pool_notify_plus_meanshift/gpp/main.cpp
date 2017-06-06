@@ -1,9 +1,9 @@
-/*  ----------------------------------- OS Specific Headers           */
+/* ------------------------------------ OS Specific Headers ----------------- */
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
 
-/*  ----------------------------------- Application Header            */
+/* ------------------------------------ Application Headers ----------------- */
 #include "pool_notify.h"
 #include "meanshift.h"
 #include "Timer.h"
@@ -15,10 +15,11 @@
 #define BASELINE_TIME_MS        12.341f
 #define BASELINE_TRACK_CYCLES   9500000000.0f
 
+
 int main(int argc, char ** argv)
 {
-    char * dspExecutable    = NULL;
-    char * strBufferSize    = NULL;
+    char dspExecutable[] = "pool_notify.out";
+    char strBufferSize[] = "128";
 
     Timer totalTimer("Total Time");
     int64_t startCycle, endCycle;
@@ -33,19 +34,17 @@ int main(int argc, char ** argv)
 
     cv::VideoCapture frame_capture;
 
-    if(argc<4)
+    if(argc<2)
     {
-        printf ("Usage : %s <path_of_DSP_executable> <buffer_size> car.avi\n", argv [0]);
+        printf ("Usage : %s car.avi\n", argv [0]);
         return -1;
     }
     else
     {
-        dspExecutable = argv[1];
-        strBufferSize = argv[2];
-        frame_capture = cv::VideoCapture(argv[3]);
+        frame_capture = cv::VideoCapture(argv[1]);
     }
 
-    pool_notify_Main(dspExecutable, strBufferSize);
+    pool_notify_Init(dspExecutable, strBufferSize);
 
     // this is used for testing the car video
     // instead of selection of object of interest using mouse
@@ -145,6 +144,8 @@ int main(int argc, char ** argv)
     #endif
     endCycle = cv::getTickCount();
     totalTimer.Pause();
+
+    pool_notify_Delete(0);
 
     std::cout << std::endl;
     totalTimer.Print();

@@ -4,6 +4,7 @@
  */
 
 #include "meanshift.h"
+#include "arm_neon.h"
 
 MeanShift::MeanShift()
 {
@@ -59,15 +60,15 @@ float  MeanShift::Epanechnikov_kernel(cv::Mat &kernel)
 // {
 //     cv::Mat kernel(rect.height,rect.width,CV_32F,cv::Scalar(0));
 //     float normalized_C = 1.0 / Epanechnikov_kernel(kernel);
-// 
+//
 //     cv::Mat pdf_model(8,16,CV_32F,cv::Scalar(1e-10));
-// 
+//
 //     cv::Vec3b curr_pixel_value;
 //     cv::Vec3b bin_value;
-// 
+//
 //     int row_index = rect.y;
 //     int clo_index = rect.x;
-// 
+//
 //     for(int i=0;i<rect.height;i++)
 //     {
 //         clo_index = rect.x;
@@ -77,20 +78,20 @@ float  MeanShift::Epanechnikov_kernel(cv::Mat &kernel)
 //             bin_value[0] = (curr_pixel_value[0] >> 4); //bin_width);
 //             bin_value[1] = (curr_pixel_value[1] >> 4); //bin_width);
 //             bin_value[2] = (curr_pixel_value[2] >> 4); //bin_width);
-// 
+//
 //             // COLLAPSE 3 MULTIPLICATIONS INTO A SINGLE ONE
 //             pdf_model.at<float>(0,bin_value[0]) += kernel.at<float>(i,j)*normalized_C;
 //             pdf_model.at<float>(1,bin_value[1]) += kernel.at<float>(i,j)*normalized_C;
 //             pdf_model.at<float>(2,bin_value[2]) += kernel.at<float>(i,j)*normalized_C;
 //             // ***********************************************************************
-// 
+//
 //             clo_index++;
 //         }
 //         row_index++;
 //     }
-// 
+//
 //     return pdf_model;
-// 
+//
 // }
 cv::Mat MeanShift::pdf_representation(const cv::Mat &frame, const cv::Rect &rect)
 {
@@ -111,7 +112,7 @@ cv::Mat MeanShift::pdf_representation(const cv::Mat &frame, const cv::Rect &rect
     return pdf_model;
 }
 
-cv::Mat MeanShift::CalWeight(const cv::Mat &window, cv::Mat &target_model, 
+cv::Mat MeanShift::CalWeight(const cv::Mat &window, cv::Mat &target_model,
                     cv::Mat &target_candidate, cv::Rect &rec)
 {
     int rows = rec.height;
@@ -127,6 +128,23 @@ cv::Mat MeanShift::CalWeight(const cv::Mat &window, cv::Mat &target_model,
 
     cv::split(window, bgr_planes);
 
+    uint_t bgr1[58][86], bgr2[58],[86];
+    uint_t tm[58][86], tc[58][86];
+
+
+    for(int r=0;r<58;r++)
+    {
+      for(int s=0;s<86;s++)
+    {
+      bgr1[r][s]=bgr_planes[1].at<uchar>(r,s);
+      bgr2[r][s]=bgr_planes[2].at<uchar>(r,s);
+      float32x2_t temp {target_model.at<float>(r,s),target_candidate.at<float>(r,s)};
+      uint32x2_t temp1=vcvt_n_u32_f32(temp1,8);
+      tm[r][s]=vget_lane_u32(temp1,0);
+      tc[r][s]=vget_lane_u32(temp1,1);
+    }
+    }
+
 #ifdef TIMING
     ticksEnd = cv::getTickCount();
     splitCount += (ticksEnd - ticksStart);
@@ -135,25 +153,24 @@ cv::Mat MeanShift::CalWeight(const cv::Mat &window, cv::Mat &target_model,
     ticksStart = cv::getTickCount();
 #endif
 
-    for(int k = 0; k < 3;  k++)
-    {
+
         for(int i=0; i<rows; i++)
         {
             for(int j=0; j<cols; j++)
             {
-                int curr_pixel = (bgr_planes[k].at<uchar>(i,j));
+                int curr_pixel = (bgr_planes[0].at<uchar>(i,j));
                 // int bin_value = curr_pixel/bin_width;
                 int bin_value = curr_pixel >> 4; // base 2 logarithm of bin_width is 4
-                weight.at<float>(i,j) *= static_cast<float>((sqrt(target_model.at<float>(k, bin_value)/target_candidate.at<float>(k, bin_value))));
+                weight.at<float>(i,j) *= static_cast<float>((sqrt(target_model.at<float>(0, bin_value)/target_candidate.at<float>(0, bin_value))));
                 // weight.at<float>(i,j) *= static_cast<float>((target_model.at<float>(k, bin_value)/target_candidate.at<float>(k, bin_value)));
                 // if (count == 1)
-                //     std::cout << "w: " << weight.at<float>(i,j) 
+                //     std::cout << "w: " << weight.at<float>(i,j)
                 //               << ", mod: " << target_model.at<float>(k, bin_value)
                 //               << ", cand: " << target_candidate.at<float>(k, bin_value)
                 //               << std::endl;
             }
         }
-    }
+
 
 #ifdef TIMING
     ticksEnd = cv::getTickCount();
@@ -199,8 +216,8 @@ cv::Rect MeanShift::track(const cv::Mat &next_frame, const cv::Mat &mult)
 
     for(int iter=0; iter<cfg.MaxIter; iter++)
     {
-        curr_window = cv::Mat(next_frame, 
-                              cv::Range(target_Region.y, target_Region.y + target_Region.height), 
+        curr_window = cv::Mat(next_frame,
+                              cv::Range(target_Region.y, target_Region.y + target_Region.height),
                               cv::Range(target_Region.x, target_Region.x + target_Region.width)
                               );
 #ifdef TIMING

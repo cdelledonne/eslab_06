@@ -63,6 +63,12 @@ cv::Mat MeanShift::pdf_representation(const cv::Mat &frame, const cv::Rect &rect
 
     int row_index = rect.y;
     int clo_index = rect.x;
+    //float32x2_t a={86.223,90.99};
+    //uint32x2_t fall= vcvt_n_u32_f32(a,8);
+    //int gamma = vget_lane_u32(fall,0);
+    //int kappa = vget_lane_u32(fall,1);
+    //int theta=(gamma<<8)/kappa;
+      //std::cout << "a0 and a1 and result       " <<gamma<<"\t"<<kappa<<"\t"<<theta<< "\n";
 
     for(int i=0;i<rect.height;i++)
     {
@@ -74,7 +80,12 @@ cv::Mat MeanShift::pdf_representation(const cv::Mat &frame, const cv::Rect &rect
             bin_value[1] = (curr_pixel_value[1]>>4);
             bin_value[2] = (curr_pixel_value[2]>>4);
 
+
             // COLLAPSE 3 MULTIPLICATIONS INTO A SINGLE ONE
+            float32x4_t pdf1 ={pdf_model.at<float>(0,bin_value[0]),pdf_model.at<float>(1,bin_value[1]),pdf_model.at<float>(2,bin_value[2]),pdf_model.at<float>(2,bin_value[2]),0};
+            float32x4_t kernel1=vdupq_n_f32((kernel.at<float>(i,j)*normalized_C));
+            uint32x4_t pdf_final= vcvtq_n_u32_f32(pdf1,8);
+            uint32x4_t kernel_final= vcvt_n_u32_f32(kernel1,8);
             pdf_model.at<float>(0,bin_value[0]) += kernel.at<float>(i,j)*normalized_C;
             pdf_model.at<float>(1,bin_value[1]) += kernel.at<float>(i,j)*normalized_C;
             pdf_model.at<float>(2,bin_value[2]) += kernel.at<float>(i,j)*normalized_C;
@@ -166,7 +177,7 @@ cv::Mat MeanShift::CalWeight(const cv::Mat &window, cv::Mat &target_model,
                 weight.at<float>(i,j+5) = vgetq_lane_f32(weight5,1);
                 weight.at<float>(i,j+6) = vgetq_lane_f32(weight5,2);
                 weight.at<float>(i,j+7) = vgetq_lane_f32(weight5,3);
-                
+
 
 
 
@@ -176,63 +187,7 @@ cv::Mat MeanShift::CalWeight(const cv::Mat &window, cv::Mat &target_model,
         }
     }
 
-  /*  for(int i=0;i<rows;i++)
-    {
-        col_index = 0;
-        for(int j=0;j<=cols-2;j=j+3)
 
-        {   float32x4_t curr_pixel={(bgr_planes[0].at<uchar>(row_index,col_index)),(bgr_planes[1].at<uchar>(row_index,col_index)),(bgr_planes[2].at<uchar>(row_index,col_index)),0};
-            float32x4_t curr_pixel1={(bgr_planes[0].at<uchar>(row_index,col_index+1)),(bgr_planes[1].at<uchar>(row_index,col_index+1)),(bgr_planes[2].at<uchar>(row_index,col_index+1)),0};
-            float32x4_t curr_pixel2={(bgr_planes[0].at<uchar>(row_index,col_index+2)),(bgr_planes[1].at<uchar>(row_index,col_index+2)),(bgr_planes[2].at<uchar>(row_index,col_index+2)),0};
-            //float32x4_t curr_pixel3={(bgr_planes[0].at<uchar>(row_index,col_index+3)),(bgr_planes[1].at<uchar>(row_index,col_index+3)),(bgr_planes[2].at<uchar>(row_index,col_index+3)),0};
-
-
-            float32x4_t bin_value=vmulq_n_f32(curr_pixel,bin_width1);
-            float32x4_t bin_value1=vmulq_n_f32(curr_pixel1,bin_width1);
-            float32x4_t bin_value2=vmulq_n_f32(curr_pixel2,bin_width1);
-            //float32x4_t bin_value3=vmulq_f32(curr_pixel3,bin_width1);
-
-            float32x4_t target_m={target_model.at<float>(0,vgetq_lane_f32(bin_value,0)),target_model.at<float>(1, vgetq_lane_f32(bin_value,1)),target_model.at<float>(2, vgetq_lane_f32(bin_value,2)),0};
-            float32x4_t target_m1={target_model.at<float>(0,vgetq_lane_f32(bin_value1,0)),target_model.at<float>(1, vgetq_lane_f32(bin_value1,1)),target_model.at<float>(2, vgetq_lane_f32(bin_value1,2)),0};
-            float32x4_t target_m2={target_model.at<float>(0,vgetq_lane_f32(bin_value2,0)),target_model.at<float>(1, vgetq_lane_f32(bin_value2,1)),target_model.at<float>(2, vgetq_lane_f32(bin_value2,2)),0};
-            //float32x4_t target_m3={target_model.at<float>(0,vgetq_lane_f32(bin_value3,0)),target_model.at<float>(1, vgetq_lane_f32(bin_value3,1)),target_model.at<float>(2, vgetq_lane_f32(bin_value3,2)),0};
-
-            float32x4_t target_c={target_candidate.at<float>(0, vgetq_lane_f32(bin_value,0)),target_candidate.at<float>(1, vgetq_lane_f32(bin_value,1)),target_candidate.at<float>(2, vgetq_lane_f32(bin_value,2)),0};
-            float32x4_t target_c1={target_candidate.at<float>(0, vgetq_lane_f32(bin_value1,0)),target_candidate.at<float>(1, vgetq_lane_f32(bin_value1,1)),target_candidate.at<float>(2, vgetq_lane_f32(bin_value1,2)),0};
-            float32x4_t target_c2={target_candidate.at<float>(0, vgetq_lane_f32(bin_value2,0)),target_candidate.at<float>(1, vgetq_lane_f32(bin_value2,1)),target_candidate.at<float>(2, vgetq_lane_f32(bin_value2,2)),0};
-            //float32x4_t target_c3={target_candidate.at<float>(0, vgetq_lane_f32(bin_value3,0)),target_candidate.at<float>(1, vgetq_lane_f32(bin_value3,1)),target_candidate.at<float>(2, vgetq_lane_f32(bin_value3,2)),0};
-
-
-            float32x4_t milan=vmulq_f32(target_m,vrecpeq_f32(target_c));
-            float32x4_t milan1=vmulq_f32(target_m1,vrecpeq_f32(target_c1));
-            float32x4_t milan2=vmulq_f32(target_m2,vrecpeq_f32(target_c2));
-            //float32x4_t milan3=vmulq_f32(target_m3,vrecpeq_f32(target_c3));
-
-           //float m2=vgetq_lane_f32(milan,2);
-           //std::cout << m2 << '\n';
-
-
-            weight.at<float>(i,j) *= vgetq_lane_f32(milan,0);
-            weight.at<float>(i,j) *= vgetq_lane_f32(milan,1);
-            weight.at<float>(i,j) *= vgetq_lane_f32(milan,2);
-
-            weight.at<float>(i,j+1) *= vgetq_lane_f32(milan1,0);
-            weight.at<float>(i,j+1) *= vgetq_lane_f32(milan1,1);
-            weight.at<float>(i,j+1) *= vgetq_lane_f32(milan1,2);
-
-            weight.at<float>(i,j+2) *= vgetq_lane_f32(milan2,0);
-            weight.at<float>(i,j+2) *= vgetq_lane_f32(milan2,1);
-            weight.at<float>(i,j+2) *= vgetq_lane_f32(milan2,2);
-
-            //weight.at<float>(i,j+3) *= vgetq_lane_f32(milan3,0);
-            //weight.at<float>(i,j+3) *= vgetq_lane_f32(milan3,1);
-            //weight.at<float>(i,j+3) *= vgetq_lane_f32(milan3,2);
-
-            col_index+=3;
-        }
-        row_index++;
-    }
-*/
     ticksEnd = cv::getTickCount();
     weightLoopCount += (ticksEnd - ticksStart);
     //std::cout << "w_loop: " << (ticksEnd - ticksStart) << ", ";

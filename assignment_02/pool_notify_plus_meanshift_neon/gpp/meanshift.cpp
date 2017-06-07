@@ -117,11 +117,9 @@ cv::Mat MeanShift::CalWeight(const cv::Mat &window, cv::Mat &target_model,
                     cv::Mat &target_candidate, cv::Rect &rec)
 {
     int rows = rec.height;
-    int cols = rec.height;
-    int row_index = 0;
-    int col_index = 0;
+    int cols = rec.width;
 
-    cv::Mat weight(rows, 86, CV_32F, cv::Scalar(1.0000));
+    cv::Mat weight(rows, cols, CV_32F, cv::Scalar(1.0000));
     std::vector<cv::Mat> bgr_planes;
 
 #ifdef TIMING
@@ -138,91 +136,50 @@ cv::Mat MeanShift::CalWeight(const cv::Mat &window, cv::Mat &target_model,
     ticksStart = cv::getTickCount();
 #endif
 
-/*
-    for(int i=0; i<rows; i++)
-    {
-        for(int j=0; j<cols; j++)
-        {
-            int curr_pixel = (bgr_planes[0].at<uchar>(i,j));
-            int bin_value = curr_pixel >> 4; // base 2 logarithm of bin_width is 4
-            weight.at<float>(i,j) = static_cast<float>(
-                (target_model.at<float>(0, bin_value)/target_candidate.at<float>(0, bin_value)));
-        }
-    }
-
-    for(int k = 1; k < 3;  k++)
-    {
-        for(int i=0; i<rows; i++)
-        {
-            for(int j=0; j<cols; j++)
-            {
-                int curr_pixel = (bgr_planes[k].at<uchar>(i,j));
-                int bin_value = curr_pixel >> 4; // base 2 logarithm of bin_width is 4
-                weight.at<float>(i,j) *= static_cast<float>(
-                    (target_model.at<float>(k, bin_value)/target_candidate.at<float>(k, bin_value)));
-            }
-        }
-    }
-*/
-
     for(int k = 0; k < 3;  k++)
     {
-        row_index = 0;
         for(int i=0;i<rows;i++)
         {
-            col_index = 0;
             for(int j=0;j<60;j=j+4)
             {
+                uint32x4_t curr_pixel = {
+                    (bgr_planes[k].at<uchar>(i,j)),
+                    (bgr_planes[k].at<uchar>(i,j+1)),
+                    (bgr_planes[k].at<uchar>(i,j+2)),
+                    (bgr_planes[k].at<uchar>(i,j+3))
+                };
 
-                uint32x4_t curr_pixel={(bgr_planes[k].at<uchar>(row_index,col_index)),(bgr_planes[k].at<uchar>(row_index,col_index+1)),(bgr_planes[k].at<uchar>(row_index,col_index+2)),(bgr_planes[k].at<uchar>(row_index,col_index+3))};//,(bgr_planes[k].at<uchar>(row_index,col_index+4)),(bgr_planes[k].at<uchar>(row_index,col_index+5)),
-                  //(bgr_planes[k].at<uchar>(row_index,col_index+6)),(bgr_planes[k].at<uchar>(row_index,col_index+7))};
+                uint32x4_t bin_value = vshrq_n_u32(curr_pixel,4);
 
+                float32x4_t target_m = {
+                    target_model.at<float>(k,vgetq_lane_u32(bin_value,0)),
+                    target_model.at<float>(k,vgetq_lane_u32(bin_value,1)),
+                    target_model.at<float>(k,vgetq_lane_u32(bin_value,2)),
+                    target_model.at<float>(k,vgetq_lane_u32(bin_value,3))
+                };
 
-                uint32x4_t bin_value=vshrq_n_u32(curr_pixel,4);
+                float32x4_t target_c = {
+                    target_candidate.at<float>(k,vgetq_lane_u32(bin_value,0)),
+                    target_candidate.at<float>(k,vgetq_lane_u32(bin_value,1)),
+                    target_candidate.at<float>(k,vgetq_lane_u32(bin_value,2)),
+                    target_candidate.at<float>(k,vgetq_lane_u32(bin_value,3))
+                };
 
+                float32x4_t milan = vmulq_f32(target_m,vrecpeq_f32(target_c));
 
-                float32x4_t target_m={target_model.at<float>(k,vgetq_lane_u32(bin_value,0)),target_model.at<float>(k, vgetq_lane_u32(bin_value,1)),target_model.at<float>(k, vgetq_lane_u32(bin_value,2)),target_model.at<float>(k, vgetq_lane_u32(bin_value,3))};
+                float32x4_t weight1 = {
+                    weight.at<float>(i,j),
+                    weight.at<float>(i,j+1),
+                    weight.at<float>(i,j+2),
+                    weight.at<float>(i,j+3)
+                };
 
-
-                //float32x4_t target_m1={target_model.at<float>(k,vgetq_lane_u32(bin_value,4)),target_model.at<float>(k, vgetq_lane_u32(bin_value,5)),target_model.at<float>(k, vgetq_lane_u32(bin_value,6)),target_model.at<float>(k, vgetq_lane_u32(bin_value,7))};
-
-
-                float32x4_t target_c={target_candidate.at<float>(k, vgetq_lane_u32(bin_value,0)),target_candidate.at<float>(k, vgetq_lane_u32(bin_value,1)),target_candidate.at<float>(k, vgetq_lane_u32(bin_value,2)),target_candidate.at<float>(k, vgetq_lane_u32(bin_value,3))};
-
-
-                //float32x4_t target_c1={target_candidate.at<float>(k, vgetq_lane_u32(bin_value,4)),target_candidate.at<float>(k, vgetq_lane_u32(bin_value,5)),target_candidate.at<float>(k, vgetq_lane_u32(bin_value,6)),target_candidate.at<float>(k, vgetq_lane_u32(bin_value,7))};
-
-
-
-                float32x4_t milan=vmulq_f32(target_m,vrecpeq_f32(target_c));
-                //float32x4_t milan1=vmulq_f32(target_m1,vrecpeq_f32(target_c1));
-
-
-
-              float32x4_t weight1={weight.at<float>(i,j),weight.at<float>(i,j+1),weight.at<float>(i,j+2),weight.at<float>(i,j+3)};
-               //float32x4_t weight2={weight.at<float>(i,j+4),weight.at<float>(i,j+5),weight.at<float>(i,j+6),weight.at<float>(i,j+7)};
-
-                float32x4_t weight4=vmulq_f32(weight1,milan);
-                //float32x4_t weight5=vmulq_f32(weight2,milan1);
-
-
-
-
+                float32x4_t weight4     = vmulq_f32(weight1,milan);
                 weight.at<float>(i,j)   = vgetq_lane_f32(weight4,0);
                 weight.at<float>(i,j+1) = vgetq_lane_f32(weight4,1);
                 weight.at<float>(i,j+2) = vgetq_lane_f32(weight4,2);
                 weight.at<float>(i,j+3) = vgetq_lane_f32(weight4,3);
-                //weight.at<float>(i,j+4) = vgetq_lane_f32(weight5,0);
-                //weight.at<float>(i,j+5) = vgetq_lane_f32(weight5,1);
-                //weight.at<float>(i,j+6) = vgetq_lane_f32(weight5,2);
-                //weight.at<float>(i,j+7) = vgetq_lane_f32(weight5,3);
-
-
-
-
-                col_index+=4;
             }
-            row_index++;
         }
     }
 
@@ -259,10 +216,10 @@ cv::Rect MeanShift::track(const cv::Mat &next_frame, const cv::Mat &mult)
     pdfCount += (ticksEnd - ticksStart);
 #endif
 
-    static int count = 0;
-    if (!count)
-        pool_notify_Execute(0);
-    count++;
+    // static int count = 0;
+    // if (!count)
+    //     pool_notify_Execute(0);
+    // count++;
 
     float centre = static_cast<float>((mult.rows-1)/2);
     float icentre = static_cast<float>(2.0/(mult.rows-1));

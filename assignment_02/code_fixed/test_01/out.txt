@@ -1,0 +1,872 @@
+--------------------------------------------------------------------------------
+I1 cache:         32768 B, 64 B, 8-way associative
+D1 cache:         32768 B, 64 B, 8-way associative
+LL cache:         36700160 B, 64 B, 35-way associative
+Command:          ./pcMeanshiftExec car.avi
+Data file:        cachegrind.out.18925
+Events recorded:  Ir I1mr ILmr Dr D1mr DLmr Dw D1mw DLmw
+Events shown:     Ir I1mr ILmr Dr D1mr DLmr Dw D1mw DLmw
+Event sort order: Ir I1mr ILmr Dr D1mr DLmr Dw D1mw DLmw
+Thresholds:       0.1 100 100 100 100 100 100 100 100
+Include dirs:     
+User annotated:   
+Auto-annotation:  on
+
+--------------------------------------------------------------------------------
+           Ir    I1mr  ILmr          Dr      D1mr   DLmr          Dw      D1mw    DLmw 
+--------------------------------------------------------------------------------
+2,121,761,270 111,674 9,869 714,970,115 6,300,979 48,312 403,867,830 4,538,133 201,185  PROGRAM TOTALS
+
+--------------------------------------------------------------------------------
+           Ir   I1mr  ILmr          Dr      D1mr   DLmr          Dw      D1mw   DLmw  file:function
+--------------------------------------------------------------------------------
+1,000,010,407 71,880 5,326 282,253,093 4,296,371    298 192,006,537 3,556,954 86,650  ???:???
+  313,445,920     73     1 141,050,664       671      0  62,689,184         1      0  /usr/include/opencv2/core/mat.hpp:float& cv::Mat::at<float>(int, int)
+  146,062,290    276     8  61,962,120   135,938      0  27,221,040       166      0  /data/home/in4342-06/assignment02/carlo/code/meanshift.cpp:MeanShift::CalWeight(cv::Mat const&, cv::Mat&, cv::Mat&, cv::Rect_<int>&)
+  107,797,412  1,019    18  35,703,778    19,513      0  23,206,634        34      0  /data/home/in4342-06/assignment02/carlo/code/meanshift.cpp:MeanShift::pdf_representation(cv::Mat const&, cv::Rect_<int> const&)
+   81,972,792      1     0  29,808,288         0      0  22,356,216         0      0  /usr/include/opencv2/core/operations.hpp:cv::Vec<float, 3>::operator[](int)
+   60,933,620    245     7  21,039,006        33      1   5,807,012         0      0  /data/home/in4342-06/assignment02/carlo/code/meanshift.cpp:MeanShift::Epanechnikov_kernel(cv::Mat&)
+   57,299,155    617    18  26,811,891     8,050      0   9,888,948       331      0  /data/home/in4342-06/assignment02/carlo/code/meanshift.cpp:MeanShift::track(cv::Mat const&)
+   54,335,497    813    21  11,525,563       628     39   6,585,632        63      0  /build/eglibc-MjiXCM/eglibc-2.19/math/../sysdeps/ieee754/dbl-64/e_pow.c:__ieee754_pow_sse2
+   52,164,504     68     2  21,528,208    48,141      0   9,108,088         1      0  /usr/include/opencv2/core/operations.hpp:_ZNK2cv3VecIhLi3EEcvNS0_IT_Li3EEEIfEEv
+   46,912,140    166     0  22,221,540       827      0   9,876,240         0      0  /usr/include/opencv2/core/mat.hpp:unsigned char& cv::Mat::at<unsigned char>(int, int)
+   34,566,840    201     2  12,345,300       166      0   7,407,180         0      0  /usr/include/c++/5/bits/stl_vector.h:std::vector<cv::Mat, std::allocator<cv::Mat> >::operator[](unsigned long)
+   29,820,240     68     2  12,425,100         0      0   4,970,040         1      0  /usr/include/opencv2/core/operations.hpp:cv::Matx<float, 3, 1>::Matx()
+   27,984,295    202     3   4,938,405         0      0   4,938,405         0      0  /build/eglibc-MjiXCM/eglibc-2.19/math/w_pow.c:pow
+   22,356,216     36     0   7,452,072         0      0   4,968,048         0      0  /usr/include/opencv2/core/operations.hpp:float cv::saturate_cast<float>(unsigned char)
+   19,044,184     35     1   7,452,072       301      0   3,312,032         0      0  /usr/include/opencv2/core/mat.hpp:cv::Vec<unsigned char, 3> const& cv::Mat::at<cv::Vec<unsigned char, 3> >(int, int) const
+   11,045,393    115    29   3,704,637   769,861  4,537   1,280,830       408     33  /build/eglibc-MjiXCM/eglibc-2.19/elf/dl-lookup.c:do_lookup_x
+   10,965,728    756     7   3,521,103   752,873    439   3,418,329   784,344 16,447  /build/eglibc-MjiXCM/eglibc-2.19/string/../sysdeps/x86_64/multiarch/memcpy-sse2-unaligned.S:__memcpy_sse2_unaligned
+    9,876,240     33     1   2,469,060         0      0           0         0      0  /build/eglibc-MjiXCM/eglibc-2.19/math/w_sqrt.c:sqrt
+    8,283,400      0     0   2,485,020         0      0   2,485,020         0      0  /usr/include/opencv2/core/operations.hpp:cv::Vec<float, 3>::Vec()
+    4,938,405      0     0           0         0      0           0         0      0  /build/eglibc-MjiXCM/eglibc-2.19/math/../sysdeps/ieee754/dbl-64/wordsize-64/math_private.h:pow
+    2,469,060      0     0           0         0      0           0         0      0  /build/eglibc-MjiXCM/eglibc-2.19/math/../sysdeps/x86_64/fpu/math_private.h:sqrt
+    2,378,084     17     1     777,491    37,331  1,192           0         0      0  /build/eglibc-MjiXCM/eglibc-2.19/string/../sysdeps/x86_64/multiarch/../strcmp.S:strcmp
+    2,132,921     62    12     369,723    13,981  4,717     159,664       307      6  /build/eglibc-MjiXCM/eglibc-2.19/elf/dl-lookup.c:_dl_lookup_symbol_x
+
+--------------------------------------------------------------------------------
+-- Auto-annotated source: /usr/include/opencv2/core/operations.hpp
+--------------------------------------------------------------------------------
+        Ir I1mr ILmr         Dr   D1mr DLmr         Dw D1mw DLmw 
+
+-- line 110 ----------------------------------------
+         .    .    .          .      .    .          .    .    .  using std::exp;
+         .    .    .          .      .    .          .    .    .  using std::log;
+         .    .    .          .      .    .          .    .    .  using std::pow;
+         .    .    .          .      .    .          .    .    .  using std::sqrt;
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  /////////////// saturate_cast (used in image & signal processing) ///////////////////
+         .    .    .          .      .    .          .    .    .  
+22,356,216   36    0  7,452,072      0    0  4,968,048    0    0  template<typename _Tp> static inline _Tp saturate_cast(uchar v) { return _Tp(v); }
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> static inline _Tp saturate_cast(schar v) { return _Tp(v); }
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> static inline _Tp saturate_cast(ushort v) { return _Tp(v); }
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> static inline _Tp saturate_cast(short v) { return _Tp(v); }
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> static inline _Tp saturate_cast(unsigned v) { return _Tp(v); }
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> static inline _Tp saturate_cast(int v) { return _Tp(v); }
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> static inline _Tp saturate_cast(float v) { return _Tp(v); }
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> static inline _Tp saturate_cast(double v) { return _Tp(v); }
+         .    .    .          .      .    .          .    .    .  
+-- line 126 ----------------------------------------
+-- line 198 ----------------------------------------
+         .    .    .          .      .    .          .    .    .  inline int fast_abs(short v) { return std::abs((int)v); }
+         .    .    .          .      .    .          .    .    .  inline int fast_abs(int v) { return std::abs(v); }
+         .    .    .          .      .    .          .    .    .  inline float fast_abs(float v) { return std::abs(v); }
+         .    .    .          .      .    .          .    .    .  inline double fast_abs(double v) { return std::abs(v); }
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  //////////////////////////////// Matx /////////////////////////////////
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  
+ 2,486,607   70    1          0      0    0  1,657,738    1    0  template<typename _Tp, int m, int n> inline Matx<_Tp, m, n>::Matx()
+         .    .    .          .      .    .          .    .    .  {
+24,870,831   70    1 10,777,413      0    0  3,316,005   64    0      for(int i = 0; i < channels; i++) val[i] = _Tp(0);
+ 2,486,607    0    0  1,657,738      0    0          0    0    0  }
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  template<typename _Tp, int m, int n> inline Matx<_Tp, m, n>::Matx(_Tp v0)
+         .    .    .          .      .    .          .    .    .  {
+         .    .    .          .      .    .          .    .    .      val[0] = v0;
+         .    .    .          .      .    .          .    .    .      for(int i = 1; i < channels; i++) val[i] = _Tp(0);
+         .    .    .          .      .    .          .    .    .  }
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  template<typename _Tp, int m, int n> inline Matx<_Tp, m, n>::Matx(_Tp v0, _Tp v1)
+-- line 217 ----------------------------------------
+-- line 1129 ----------------------------------------
+         .    .    .          .      .    .          .    .    .  Matx<_Tp, m, n> MatxCommaInitializer<_Tp, m, n>::operator *() const
+         .    .    .          .      .    .          .    .    .  {
+         .    .    .          .      .    .          .    .    .      CV_DbgAssert( idx == n*m );
+         .    .    .          .      .    .          .    .    .      return *dst;
+         .    .    .          .      .    .          .    .    .  }
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  /////////////////////////// short vector (Vec) /////////////////////////////
+         .    .    .          .      .    .          .    .    .  
+ 5,802,083   36    0    828,869      0    0  2,486,607   32    0  template<typename _Tp, int cn> inline Vec<_Tp, cn>::Vec()
+ 2,486,607    0    0  1,657,738      0    0          0    0    0  {}
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  template<typename _Tp, int cn> inline Vec<_Tp, cn>::Vec(_Tp v0)
+         .    .    .          .      .    .          .    .    .      : Matx<_Tp, cn, 1>(v0)
+         .    .    .          .      .    .          .    .    .  {}
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  template<typename _Tp, int cn> inline Vec<_Tp, cn>::Vec(_Tp v0, _Tp v1)
+         .    .    .          .      .    .          .    .    .      : Matx<_Tp, cn, 1>(v0, v1)
+         .    .    .          .      .    .          .    .    .  {}
+-- line 1146 ----------------------------------------
+-- line 1253 ----------------------------------------
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  template<typename _Tp, int cn> inline Vec<_Tp, cn> Vec<_Tp, cn>::cross(const Vec<_Tp, cn>&) const
+         .    .    .          .      .    .          .    .    .  {
+         .    .    .          .      .    .          .    .    .      CV_Error(CV_StsError, "for arbitrary-size vector there is no cross-product defined");
+         .    .    .          .      .    .          .    .    .      return Vec<_Tp, cn>();
+         .    .    .          .      .    .          .    .    .  }
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  template<typename _Tp, int cn> template<typename T2>
+ 4,140,040    0    0          0      0    0  2,484,024    0    0  inline Vec<_Tp, cn>::operator Vec<T2, cn>() const
+         .    .    .          .      .    .          .    .    .  {
+ 2,484,024   34    1    828,008      0    0    828,008    1    0      Vec<T2, cn> v;
+42,228,408   34    1 18,216,176 48,141    0  5,796,056    0    0      for( int i = 0; i < cn; i++ ) v.val[i] = saturate_cast<T2>(this->val[i]);
+   828,008    0    0          0      0    0          0    0    0      return v;
+ 2,484,024    0    0  2,484,024      0    0          0    0    0  }
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  template<typename _Tp, int cn> inline Vec<_Tp, cn>::operator CvScalar() const
+         .    .    .          .      .    .          .    .    .  {
+         .    .    .          .      .    .          .    .    .      CvScalar s = {{0,0,0,0}};
+         .    .    .          .      .    .          .    .    .      int i;
+         .    .    .          .      .    .          .    .    .      for( i = 0; i < std::min(cn, 4); i++ ) s.val[i] = this->val[i];
+         .    .    .          .      .    .          .    .    .      for( ; i < 4; i++ ) s.val[i] = 0;
+         .    .    .          .      .    .          .    .    .      return s;
+-- line 1274 ----------------------------------------
+-- line 1275 ----------------------------------------
+         .    .    .          .      .    .          .    .    .  }
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  template<typename _Tp, int cn> inline const _Tp& Vec<_Tp, cn>::operator [](int i) const
+         .    .    .          .      .    .          .    .    .  {
+         .    .    .          .      .    .          .    .    .      CV_DbgAssert( (unsigned)i < (unsigned)cn );
+         .    .    .          .      .    .          .    .    .      return this->val[i];
+         .    .    .          .      .    .          .    .    .  }
+         .    .    .          .      .    .          .    .    .  
+29,808,288    1    0          0      0    0 22,356,216    0    0  template<typename _Tp, int cn> inline _Tp& Vec<_Tp, cn>::operator [](int i)
+         .    .    .          .      .    .          .    .    .  {
+         .    .    .          .      .    .          .    .    .      CV_DbgAssert( (unsigned)i < (unsigned)cn );
+37,260,360    0    0 14,904,144      0    0          0    0    0      return this->val[i];
+14,904,144    0    0 14,904,144      0    0          0    0    0  }
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  template<typename _Tp, int cn> inline const _Tp& Vec<_Tp, cn>::operator ()(int i) const
+         .    .    .          .      .    .          .    .    .  {
+         .    .    .          .      .    .          .    .    .      CV_DbgAssert( (unsigned)i < (unsigned)cn );
+         .    .    .          .      .    .          .    .    .      return this->val[i];
+         .    .    .          .      .    .          .    .    .  }
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  template<typename _Tp, int cn> inline _Tp& Vec<_Tp, cn>::operator ()(int i)
+-- line 1295 ----------------------------------------
+-- line 1851 ----------------------------------------
+         .    .    .          .      .    .          .    .    .  { return Point3_<_Tp>( saturate_cast<_Tp>(b.x*a),
+         .    .    .          .      .    .          .    .    .                        saturate_cast<_Tp>(b.y*a),
+         .    .    .          .      .    .          .    .    .                        saturate_cast<_Tp>(b.z*a) ); }
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  //////////////////////////////// Size ////////////////////////////////
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> inline Size_<_Tp>::Size_()
+         .    .    .          .      .    .          .    .    .      : width(0), height(0) {}
+         5    2    0          0      0    0          4    0    0  template<typename _Tp> inline Size_<_Tp>::Size_(_Tp _width, _Tp _height)
+         9    0    0          6      0    0          2    1    0      : width(_width), height(_height) {}
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> inline Size_<_Tp>::Size_(const Size_& sz)
+         .    .    .          .      .    .          .    .    .      : width(sz.width), height(sz.height) {}
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> inline Size_<_Tp>::Size_(const CvSize& sz)
+         .    .    .          .      .    .          .    .    .      : width(saturate_cast<_Tp>(sz.width)), height(saturate_cast<_Tp>(sz.height)) {}
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> inline Size_<_Tp>::Size_(const CvSize2D32f& sz)
+         .    .    .          .      .    .          .    .    .      : width(saturate_cast<_Tp>(sz.width)), height(saturate_cast<_Tp>(sz.height)) {}
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> inline Size_<_Tp>::Size_(const Point_<_Tp>& pt) : width(pt.x), height(pt.y) {}
+         .    .    .          .      .    .          .    .    .  
+-- line 1868 ----------------------------------------
+-- line 1891 ----------------------------------------
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> static inline bool operator == (const Size_<_Tp>& a, const Size_<_Tp>& b)
+         .    .    .          .      .    .          .    .    .  { return a.width == b.width && a.height == b.height; }
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> static inline bool operator != (const Size_<_Tp>& a, const Size_<_Tp>& b)
+         .    .    .          .      .    .          .    .    .  { return a.width != b.width || a.height != b.height; }
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  //////////////////////////////// Rect ////////////////////////////////
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  
+       462   66    2        198      0    0        198    0    0  template<typename _Tp> inline Rect_<_Tp>::Rect_() : x(0), y(0), width(0), height(0) {}
+        22    1    1         10      0    0         10    0    0  template<typename _Tp> inline Rect_<_Tp>::Rect_(_Tp _x, _Tp _y, _Tp _width, _Tp _height) : x(_x), y(_y), width(_width), height(_height) {}
+       736   32    0        448      0    0        224   32    0  template<typename _Tp> inline Rect_<_Tp>::Rect_(const Rect_<_Tp>& r) : x(r.x), y(r.y), width(r.width), height(r.height) {}
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> inline Rect_<_Tp>::Rect_(const CvRect& r) : x((_Tp)r.x), y((_Tp)r.y), width((_Tp)r.width), height((_Tp)r.height) {}
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> inline Rect_<_Tp>::Rect_(const Point_<_Tp>& org, const Size_<_Tp>& sz) :
+         .    .    .          .      .    .          .    .    .      x(org.x), y(org.y), width(sz.width), height(sz.height) {}
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> inline Rect_<_Tp>::Rect_(const Point_<_Tp>& pt1, const Point_<_Tp>& pt2)
+         .    .    .          .      .    .          .    .    .  {
+         .    .    .          .      .    .          .    .    .      x = std::min(pt1.x, pt2.x); y = std::min(pt1.y, pt2.y);
+         .    .    .          .      .    .          .    .    .      width = std::max(pt1.x, pt2.x) - x; height = std::max(pt1.y, pt2.y) - y;
+         .    .    .          .      .    .          .    .    .  }
+         4    0    0          0      0    0          3    0    0  template<typename _Tp> inline Rect_<_Tp>& Rect_<_Tp>::operator = ( const Rect_<_Tp>& r )
+        19    1    1         15      1    0          4    0    0  { x = r.x; y = r.y; width = r.width; height = r.height; return *this; }
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> inline Point_<_Tp> Rect_<_Tp>::tl() const { return Point_<_Tp>(x,y); }
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> inline Point_<_Tp> Rect_<_Tp>::br() const { return Point_<_Tp>(x+width, y+height); }
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> static inline Rect_<_Tp>& operator += ( Rect_<_Tp>& a, const Point_<_Tp>& b )
+         .    .    .          .      .    .          .    .    .  { a.x += b.x; a.y += b.y; return a; }
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> static inline Rect_<_Tp>& operator -= ( Rect_<_Tp>& a, const Point_<_Tp>& b )
+         .    .    .          .      .    .          .    .    .  { a.x -= b.x; a.y -= b.y; return a; }
+-- line 1919 ----------------------------------------
+-- line 2010 ----------------------------------------
+         .    .    .          .      .    .          .    .    .      return box;
+         .    .    .          .      .    .          .    .    .  }
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  //////////////////////////////// Scalar_ ///////////////////////////////
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> inline Scalar_<_Tp>::Scalar_()
+         .    .    .          .      .    .          .    .    .  { this->val[0] = this->val[1] = this->val[2] = this->val[3] = 0; }
+         .    .    .          .      .    .          .    .    .  
+       352   64    2         32      0    0        224    0    0  template<typename _Tp> inline Scalar_<_Tp>::Scalar_(_Tp v0, _Tp v1, _Tp v2, _Tp v3)
+       480    0    0        320      0    0        128    0    0  { this->val[0] = v0; this->val[1] = v1; this->val[2] = v2; this->val[3] = v3; }
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> inline Scalar_<_Tp>::Scalar_(const CvScalar& s)
+         .    .    .          .      .    .          .    .    .  {
+         .    .    .          .      .    .          .    .    .      this->val[0] = saturate_cast<_Tp>(s.val[0]);
+         .    .    .          .      .    .          .    .    .      this->val[1] = saturate_cast<_Tp>(s.val[1]);
+         .    .    .          .      .    .          .    .    .      this->val[2] = saturate_cast<_Tp>(s.val[2]);
+         .    .    .          .      .    .          .    .    .      this->val[3] = saturate_cast<_Tp>(s.val[3]);
+         .    .    .          .      .    .          .    .    .  }
+         .    .    .          .      .    .          .    .    .  
+     3,976   70    2        497      0    0      1,988    0    0  template<typename _Tp> inline Scalar_<_Tp>::Scalar_(_Tp v0)
+     8,449    2    0      5,467      0    0      1,988    0    0  { this->val[0] = v0; this->val[1] = this->val[2] = this->val[3] = 0; }
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> inline Scalar_<_Tp> Scalar_<_Tp>::all(_Tp v0)
+         .    .    .          .      .    .          .    .    .  { return Scalar_<_Tp>(v0, v0, v0, v0); }
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> inline Scalar_<_Tp>::operator CvScalar() const
+         .    .    .          .      .    .          .    .    .  { return cvScalar(this->val[0], this->val[1], this->val[2], this->val[3]); }
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> template<typename T2> inline Scalar_<_Tp>::operator Scalar_<T2>() const
+         .    .    .          .      .    .          .    .    .  {
+-- line 2038 ----------------------------------------
+-- line 2593 ----------------------------------------
+         .    .    .          .      .    .          .    .    .      }
+         .    .    .          .      .    .          .    .    .      else
+         .    .    .          .      .    .          .    .    .          refcount = 0;
+         .    .    .          .      .    .          .    .    .  }
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> inline void Ptr<_Tp>::addref()
+         .    .    .          .      .    .          .    .    .  { if( refcount ) CV_XADD(refcount, 1); }
+         .    .    .          .      .    .          .    .    .  
+         4    2    2          0      0    0          2    0    0  template<typename _Tp> inline void Ptr<_Tp>::release()
+         .    .    .          .      .    .          .    .    .  {
+         7    0    0          2      1    0          0    0    0      if( refcount && CV_XADD(refcount, -1) == 1 )
+         .    .    .          .      .    .          .    .    .      {
+         .    .    .          .      .    .          .    .    .          delete_obj();
+         .    .    .          .      .    .          .    .    .          fastFree(refcount);
+         .    .    .          .      .    .          .    .    .      }
+         2    1    1          1      0    0          1    0    0      refcount = 0;
+         2    0    0          1      0    0          1    0    0      obj = 0;
+         3    0    0          2      0    0          0    0    0  }
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> inline void Ptr<_Tp>::delete_obj()
+         .    .    .          .      .    .          .    .    .  {
+         .    .    .          .      .    .          .    .    .      if( obj ) delete obj;
+         .    .    .          .      .    .          .    .    .  }
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> inline Ptr<_Tp>::~Ptr() { release(); }
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> inline Ptr<_Tp>::Ptr(const Ptr<_Tp>& _ptr)
+         .    .    .          .      .    .          .    .    .  {
+         .    .    .          .      .    .          .    .    .      obj = _ptr.obj;
+         .    .    .          .      .    .          .    .    .      refcount = _ptr.refcount;
+         .    .    .          .      .    .          .    .    .      addref();
+         .    .    .          .      .    .          .    .    .  }
+         .    .    .          .      .    .          .    .    .  
+         5    1    1          0      0    0          3    0    0  template<typename _Tp> inline Ptr<_Tp>& Ptr<_Tp>::operator = (const Ptr<_Tp>& _ptr)
+         .    .    .          .      .    .          .    .    .  {
+         3    0    0          2      0    0          1    0    0      _Atomic_word* _refcount = _ptr.refcount;
+         2    1    1          1      0    0          0    0    0      if( _refcount )
+         2    0    0          3      0    0          0    0    0          CV_XADD(_refcount, 1);
+         3    0    0          1      0    0          1    0    0      release();
+         4    0    0          3      0    0          1    0    0      obj = _ptr.obj;
+         3    0    0          2      0    0          1    0    0      refcount = _refcount;
+         1    0    0          1      0    0          0    0    0      return *this;
+         2    0    0          2      0    0          0    0    0  }
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> inline _Tp* Ptr<_Tp>::operator -> () { return obj; }
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> inline const _Tp* Ptr<_Tp>::operator -> () const { return obj; }
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> inline Ptr<_Tp>::operator _Tp* () { return obj; }
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> inline Ptr<_Tp>::operator const _Tp*() const { return obj; }
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  template<typename _Tp> inline bool Ptr<_Tp>::empty() const { return obj == 0; }
+-- line 2643 ----------------------------------------
+
+--------------------------------------------------------------------------------
+-- Auto-annotated source: /data/home/in4342-06/assignment02/carlo/code/meanshift.cpp
+--------------------------------------------------------------------------------
+        Ir I1mr ILmr         Dr   D1mr DLmr         Dw D1mw DLmw 
+
+         .    .    .          .      .    .          .    .    .  /*
+         .    .    .          .      .    .          .    .    .   * Based on paper "Kernel-Based Object Tracking"
+         .    .    .          .      .    .          .    .    .   * you can find all the formula in the paper
+         .    .    .          .      .    .          .    .    .  */
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  #include "meanshift.h"
+         .    .    .          .      .    .          .    .    .  
+        12    2    2          2      0    0          4    0    0  MeanShift::MeanShift()
+         .    .    .          .      .    .          .    .    .  {
+         2    0    0          1      0    0          1    1    0      cfg.MaxIter = 8;
+         2    0    0          1      0    0          1    0    0      cfg.num_bins = 16;
+         2    0    0          1      0    0          1    0    0      cfg.piexl_range = 256;
+        10    1    1          5      0    0          1    0    0      bin_width = cfg.piexl_range / cfg.num_bins;
+         3    0    0          2      0    0          0    0    0  }
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  void  MeanShift::Init_target_frame(const cv::Mat &frame,const cv::Rect &rect)
+         7    0    0          0      0    0          5    0    0  {
+         6    1    1          2      0    0          1    0    0      target_Region = rect;
+        16    0    0          4      0    0          3    0    0      target_model = pdf_representation(frame,target_Region);
+         5    0    0          3      0    0          0    0    0  }
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  float  MeanShift::Epanechnikov_kernel(cv::Mat &kernel)
+       830   70    2          0      0    0        498    0    0  {
+       498    0    0        332      0    0        166    0    0      int h = kernel.rows;
+       498    0    0        332      0    0        166    0    0      int w = kernel.cols;
+         .    .    .          .      .    .          .    .    .  
+     1,494   35    1        498     33    1        166    0    0      float epanechnikov_cd = 0.1*PI*h*w;
+       332    0    0          0      0    0        166    0    0      float kernel_sum = 0.0;
+    48,804    0    0     29,216      0    0        166    0    0      for(int i=0;i<h;i++)
+         .    .    .          .      .    .          .    .    .      {
+ 4,178,552    0    0  2,503,280      0    0      9,628    0    0          for(int j=0;j<w;j++)
+         .    .    .          .      .    .          .    .    .          {
+ 9,108,088   35    1  1,656,016      0    0    828,008    0    0              float x = static_cast<float>(i - h/2);
+ 9,108,088    0    0  1,656,016      0    0    828,008    0    0              float  y = static_cast<float> (j - w/2);
+20,700,200   70    2  6,624,064      0    0    828,008    0    0              float norm_x = x*x/(h*h/4)+y*y/(w*w/4);
+ 8,677,650   35    1  3,600,706      0    0    828,008    0    0              float result =norm_x<1?(epanechnikov_cd*(1.0-norm_x)):0;
+ 6,624,064    0    0  3,312,032      0    0  1,656,016    0    0              kernel.at<float>(i,j) = result;
+ 2,484,024    0    0  1,656,016      0    0    828,008    0    0              kernel_sum += result;
+         .    .    .          .      .    .          .    .    .          }
+         .    .    .          .      .    .          .    .    .      }
+       166    0    0        166      0    0          0    0    0      return kernel_sum;
+       332    0    0        332      0    0          0    0    0  }
+         .    .    .          .      .    .          .    .    .  cv::Mat MeanShift::pdf_representation(const cv::Mat &frame, const cv::Rect &rect)
+     1,328   35    1          0      0    0        996    0    0  {
+     2,822   35    1        664     32    0        498   33    0      cv::Mat kernel(rect.height,rect.width,CV_32F,cv::Scalar(0));
+     1,494   35    1        332      5    0        332    0    0      float normalized_C = 1.0 / Epanechnikov_kernel(kernel);
+         .    .    .          .      .    .          .    .    .  
+     2,324  166    1        332      0    0        498    0    0      cv::Mat pdf_model(8,16,CV_32F,cv::Scalar(1e-10));
+         .    .    .          .      .    .          .    .    .  
+       498   34    1          0      0    0        166    0    0      cv::Vec3f curr_pixel_value;
+       498    0    0          0      0    0        166    0    0      cv::Vec3f bin_value;
+         .    .    .          .      .    .          .    .    .  
+       498    0    0        332      0    0        166    0    0      int row_index = rect.y;
+       498    0    0        332      0    0        166    0    0      int clo_index = rect.x;
+         .    .    .          .      .    .          .    .    .  
+    58,598  201    2     39,010      0    0        166    0    0      for(int i=0;i<rect.height;i++)
+         .    .    .          .      .    .          .    .    .      {
+    28,884    0    0     19,256      0    0      9,628    0    0          clo_index = rect.x;
+ 5,016,188  168    1  3,340,916      1    0      9,628    0    0          for(int j=0;j<rect.width;j++)
+         .    .    .          .      .    .          .    .    .          {
+12,420,120   34    1  4,140,040      0    0  3,312,032    0    0              curr_pixel_value = frame.at<cv::Vec3b>(row_index,clo_index);
+11,592,112   36    1  2,484,024     35    0  2,484,024    1    0              bin_value[0] = (curr_pixel_value[0]/bin_width);
+11,592,112   35    1  2,484,024      0    0  2,484,024    0    0              bin_value[1] = (curr_pixel_value[1]/bin_width);
+11,592,112   34    1  2,484,024      0    0  2,484,024    0    0              bin_value[2] = (curr_pixel_value[2]/bin_width);
+18,216,176   69    2  6,624,064 19,437    0  4,140,040    0    0              pdf_model.at<float>(0,bin_value[0]) += kernel.at<float>(i,j)*normalized_C;
+18,216,176   34    1  6,624,064      1    0  4,140,040    0    0              pdf_model.at<float>(1,bin_value[1]) += kernel.at<float>(i,j)*normalized_C;
+18,216,176   69    2  6,624,064      1    0  4,140,040    0    0              pdf_model.at<float>(2,bin_value[2]) += kernel.at<float>(i,j)*normalized_C;
+   828,008    0    0    828,008      0    0          0    0    0              clo_index++;
+         .    .    .          .      .    .          .    .    .          }
+     9,628    0    0      9,628      0    0          0    0    0          row_index++;
+         .    .    .          .      .    .          .    .    .      }
+         .    .    .          .      .    .          .    .    .  
+       332    0    0          0      0    0          0    0    0      return pdf_model;
+         .    .    .          .      .    .          .    .    .  
+       830   34    1        664      1    0          0    0    0  }
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  cv::Mat MeanShift::CalWeight(const cv::Mat &frame, cv::Mat &target_model, 
+         .    .    .          .      .    .          .    .    .                      cv::Mat &target_candidate, cv::Rect &rec)
+     1,650    0    0          0      0    0      1,320    0    0  {
+       495   33    1        330      0    0        165    0    0      int rows = rec.height;
+       495    0    0        330      0    0        165    0    0      int cols = rec.width;
+       495    0    0        330      0    0        165    0    0      int row_index = rec.y;
+       495    0    0        330      0    0        165    0    0      int col_index = rec.x;
+         .    .    .          .      .    .          .    .    .  
+     1,980   33    1        660    165    0        330    0    0      cv::Mat weight(rows,cols,CV_32F,cv::Scalar(1.0000));
+       990    0    0          0      0    0        330    0    0      std::vector<cv::Mat> bgr_planes;
+       825    0    0        165      0    0        165    0    0      cv::split(frame, bgr_planes);
+         .    .    .          .      .    .          .    .    .  
+     2,475   69    2      1,155      0    0        165  165    0      for(int k = 0; k < 3;  k++)
+         .    .    .          .      .    .          .    .    .      {
+     1,485    0    0        990    165    0        495    0    0          row_index = rec.y;
+   145,530    0    0     87,120      0    0        495    0    0          for(int i=0;i<rows;i++)
+         .    .    .          .      .    .          .    .    .          {
+    86,130    0    0     57,420      0    0     28,710    0    0              col_index = rec.x;
+12,460,140   32    1  7,464,600      0    0     28,710    0    0              for(int j=0;j<cols;j++)
+         .    .    .          .      .    .          .    .    .              {
+37,035,900   34    1  9,876,240 67,745    0  7,407,180    0    0                  int curr_pixel = (bgr_planes[k].at<uchar>(row_index,col_index));
+17,283,420    0    0  7,407,180    166    0  2,469,060    0    0                  int bin_value = curr_pixel/bin_width;
+76,540,860   71    2 34,566,840 67,697    0 17,283,420    1    0                  weight.at<float>(i,j) *= static_cast<float>((sqrt(target_model.at<float>(k, bin_value)/target_candidate.at<float>(k, bin_value))));
+ 2,469,060    0    0  2,469,060      0    0          0    0    0                  col_index++;
+         .    .    .          .      .    .          .    .    .              }
+    28,710    0    0     28,710      0    0          0    0    0              row_index++;
+         .    .    .          .      .    .          .    .    .          }
+         .    .    .          .      .    .          .    .    .      }
+         .    .    .          .      .    .          .    .    .  
+       330    0    0          0      0    0          0    0    0      return weight;
+       825    4    0        660      0    0          0    0    0  }
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .  cv::Rect MeanShift::track(const cv::Mat &next_frame)
+       224   32    1          0      0    0        160    0    0  {
+        96    0    0         32      0    0         32    0    0      cv::Rect next_rect;
+       982   34    1        644    169    0         32    0    0      for(int iter=0; iter<cfg.MaxIter; iter++)
+         .    .    .          .      .    .          .    .    .      {
+         .    .    .          .      .    .          .    .    .          // MOVE THE FOLLOWING LINE OUTSIDE THE LOOP
+     1,292   33    1        495      0    0        165    0    0          cv::Mat target_candidate = pdf_representation(next_frame,target_Region);
+         .    .    .          .      .    .          .    .    .          // *********************************************************************
+         .    .    .          .      .    .          .    .    .          
+     3,079   33    1        660    165    0        330    0    0          cv::Mat weight = CalWeight(next_frame,target_model,target_candidate,target_Region);
+         .    .    .          .      .    .          .    .    .  
+       330    3    0          0      0    0        165  165    0          float delta_x = 0.0;
+       330    0    0          0      0    0        165    0    0          float sum_wij = 0.0;
+       330    0    0          0      0    0        165    0    0          float delta_y = 0.0;
+     1,320   34    1        330    165    0        165    0    0          float centre = static_cast<float>((weight.rows-1)/2.0);
+       330    0    0          0      0    0        165    0    0          double mult = 0.0;
+         .    .    .          .      .    .          .    .    .  
+       660    0    0        495      0    0        165  165    0          next_rect.x = target_Region.x;
+       660   34    1        495      0    0        165    0    0          next_rect.y = target_Region.y;
+       660    0    0        495      0    0        165    0    0          next_rect.width = target_Region.width;
+       660    0    0        495      0    0        165    0    0          next_rect.height = target_Region.height;
+         .    .    .          .      .    .          .    .    .  
+    48,510   35    1     29,040      0    0        165    0    0          for(int i=0; i<weight.rows; i++)
+         .    .    .          .      .    .          .    .    .          {
+ 4,153,380    1    0  2,488,200      1    0      9,570    0    0              for(int j=0; j<weight.cols; j++)
+         .    .    .          .      .    .          .    .    .              {
+         .    .    .          .      .    .          .    .    .                  // MOVE THE FOLLOWING LINE ONE LEVEL ABOVE
+ 4,115,100    0    0  2,469,060      0    0    823,020    0    0                  float norm_i = static_cast<float>(i-centre)/centre;
+         .    .    .          .      .    .          .    .    .                  // ************************************************
+         .    .    .          .      .    .          .    .    .  
+ 4,115,100   35    1  2,469,060      0    0    823,020    0    0                  float norm_j = static_cast<float>(j-centre)/centre;
+11,103,840   69    2  5,356,560      1    0  3,292,080    0    0                  mult = pow(norm_i,2)+pow(norm_j,2)>1.0?0.0:1.0;
+11,522,280   35    1  4,938,120  7,547    0  1,646,040    0    0                  delta_x += static_cast<float>(norm_j*weight.at<float>(i,j)*mult);
+11,522,280   34    1  4,938,120      0    0  1,646,040    1    0                  delta_y += static_cast<float>(norm_i*weight.at<float>(i,j)*mult);
+10,699,260   34    1  4,115,100      0    0  1,646,040    0    0                  sum_wij += static_cast<float>(weight.at<float>(i,j)*mult);
+         .    .    .          .      .    .          .    .    .  
+         .    .    .          .      .    .          .    .    .                  // REPLACE THE ABOVE BLOCK WITH THE FOLLOWING
+         .    .    .          .      .    .          .    .    .                  // if (pow(norm_i,2)+pow(norm_j,2) <= 1.0) {
+         .    .    .          .      .    .          .    .    .                  //     delta_x += static_cast<float>(norm_j*weight.at<float>(i,j));
+         .    .    .          .      .    .          .    .    .                  //     delta_y += static_cast<float>(norm_i*weight.at<float>(i,j));
+         .    .    .          .      .    .          .    .    .                  //     sum_wij += static_cast<float>(weight.at<float>(i,j));
+         .    .    .          .      .    .          .    .    .                  // }
+         .    .    .          .      .    .          .    .    .              }
+         .    .    .          .      .    .          .    .    .          }
+         .    .    .          .      .    .          .    .    .  
+     1,485   34    1        990      1    0        165    0    0          next_rect.x += static_cast<int>((delta_x/sum_wij)*centre);
+     1,485   34    1        990      0    0        165    0    0          next_rect.y += static_cast<int>((delta_y/sum_wij)*centre);
+         .    .    .          .      .    .          .    .    .  
+     3,176   37    1      1,560      1    0          0    0    0          if(abs(next_rect.x-target_Region.x)<1 && abs(next_rect.y-target_Region.y)<1)
+         .    .    .          .      .    .          .    .    .          {
+         .    .    .          .      .    .          .    .    .              break;
+         .    .    .          .      .    .          .    .    .          }
+         .    .    .          .      .    .          .    .    .          else
+         .    .    .          .      .    .          .    .    .          {
+       548   30    1        411      0    0        137    0    0              target_Region.x = next_rect.x;
+     1,566   34    1        411      0    0        302    0    0              target_Region.y = next_rect.y;
+         .    .    .          .      .    .          .    .    .          }
+         .    .    .          .      .    .          .    .    .      }
+         .    .    .          .      .    .          .    .    .  
+        32    2    0          0      0    0          0    0    0      return next_rect;
+       179    3    3        134      0    0          5    0    0  }
+
+--------------------------------------------------------------------------------
+-- Auto-annotated source: /usr/include/c++/5/bits/stl_vector.h
+--------------------------------------------------------------------------------
+        Ir I1mr ILmr         Dr D1mr DLmr        Dw D1mw DLmw 
+
+-- line 71 ----------------------------------------
+         .    .    .          .    .    .         .    .    .    template<typename _Tp, typename _Alloc>
+         .    .    .          .    .    .         .    .    .      struct _Vector_base
+         .    .    .          .    .    .         .    .    .      {
+         .    .    .          .    .    .         .    .    .        typedef typename __gnu_cxx::__alloc_traits<_Alloc>::template
+         .    .    .          .    .    .         .    .    .          rebind<_Tp>::other _Tp_alloc_type;
+         .    .    .          .    .    .         .    .    .        typedef typename __gnu_cxx::__alloc_traits<_Tp_alloc_type>::pointer
+         .    .    .          .    .    .         .    .    .         	pointer;
+         .    .    .          .    .    .         .    .    .  
+     1,650    0    0        495    0    0       495    0    0        struct _Vector_impl 
+         .    .    .          .    .    .         .    .    .        : public _Tp_alloc_type
+         .    .    .          .    .    .         .    .    .        {
+         .    .    .          .    .    .         .    .    .  	pointer _M_start;
+         .    .    .          .    .    .         .    .    .  	pointer _M_finish;
+         .    .    .          .    .    .         .    .    .  	pointer _M_end_of_storage;
+         .    .    .          .    .    .         .    .    .  
+       660   64    2          0    0    0       330    0    0  	_Vector_impl()
+     1,485    0    0        660    0    0       660    0    0  	: _Tp_alloc_type(), _M_start(), _M_finish(), _M_end_of_storage()
+       495    0    0        330    0    0         0    0    0  	{ }
+         .    .    .          .    .    .         .    .    .  
+         .    .    .          .    .    .         .    .    .  	_Vector_impl(_Tp_alloc_type const& __a) _GLIBCXX_NOEXCEPT
+         .    .    .          .    .    .         .    .    .  	: _Tp_alloc_type(__a), _M_start(), _M_finish(), _M_end_of_storage()
+         .    .    .          .    .    .         .    .    .  	{ }
+         .    .    .          .    .    .         .    .    .  
+         .    .    .          .    .    .         .    .    .  #if __cplusplus >= 201103L
+         .    .    .          .    .    .         .    .    .  	_Vector_impl(_Tp_alloc_type&& __a) noexcept
+         .    .    .          .    .    .         .    .    .  	: _Tp_alloc_type(std::move(__a)),
+-- line 96 ----------------------------------------
+-- line 105 ----------------------------------------
+         .    .    .          .    .    .         .    .    .  	  std::swap(_M_end_of_storage, __x._M_end_of_storage);
+         .    .    .          .    .    .         .    .    .  	}
+         .    .    .          .    .    .         .    .    .        };
+         .    .    .          .    .    .         .    .    .        
+         .    .    .          .    .    .         .    .    .      public:
+         .    .    .          .    .    .         .    .    .        typedef _Alloc allocator_type;
+         .    .    .          .    .    .         .    .    .  
+         .    .    .          .    .    .         .    .    .        _Tp_alloc_type&
+       495    3    0          0    0    0       330    0    0        _M_get_Tp_allocator() _GLIBCXX_NOEXCEPT
+       495    0    0        495    0    0         0    0    0        { return *static_cast<_Tp_alloc_type*>(&this->_M_impl); }
+         .    .    .          .    .    .         .    .    .  
+         .    .    .          .    .    .         .    .    .        const _Tp_alloc_type&
+         .    .    .          .    .    .         .    .    .        _M_get_Tp_allocator() const _GLIBCXX_NOEXCEPT
+         .    .    .          .    .    .         .    .    .        { return *static_cast<const _Tp_alloc_type*>(&this->_M_impl); }
+         .    .    .          .    .    .         .    .    .  
+         .    .    .          .    .    .         .    .    .        allocator_type
+         .    .    .          .    .    .         .    .    .        get_allocator() const _GLIBCXX_NOEXCEPT
+         .    .    .          .    .    .         .    .    .        { return allocator_type(_M_get_Tp_allocator()); }
+         .    .    .          .    .    .         .    .    .  
+       660    0    0          0    0    0       330    0    0        _Vector_base()
+       990    0    0        495    0    0       165    0    0        : _M_impl() { }
+         .    .    .          .    .    .         .    .    .  
+         .    .    .          .    .    .         .    .    .        _Vector_base(const allocator_type& __a) _GLIBCXX_NOEXCEPT
+         .    .    .          .    .    .         .    .    .        : _M_impl(__a) { }
+         .    .    .          .    .    .         .    .    .  
+         .    .    .          .    .    .         .    .    .        _Vector_base(size_t __n)
+         .    .    .          .    .    .         .    .    .        : _M_impl()
+         .    .    .          .    .    .         .    .    .        { _M_create_storage(__n); }
+         .    .    .          .    .    .         .    .    .  
+-- line 133 ----------------------------------------
+-- line 151 ----------------------------------------
+         .    .    .          .    .    .         .    .    .  	else
+         .    .    .          .    .    .         .    .    .  	  {
+         .    .    .          .    .    .         .    .    .  	    size_t __n = __x._M_impl._M_finish - __x._M_impl._M_start;
+         .    .    .          .    .    .         .    .    .  	    _M_create_storage(__n);
+         .    .    .          .    .    .         .    .    .  	  }
+         .    .    .          .    .    .         .    .    .        }
+         .    .    .          .    .    .         .    .    .  #endif
+         .    .    .          .    .    .         .    .    .  
+       825   55    1          0    0    0       495    0    0        ~_Vector_base() _GLIBCXX_NOEXCEPT
+     2,310   34    1        495    0    0       165    0    0        { _M_deallocate(this->_M_impl._M_start, this->_M_impl._M_end_of_storage
+     1,980    0    0      1,320    0    0       165    0    0  		      - this->_M_impl._M_start); }
+         .    .    .          .    .    .         .    .    .  
+         .    .    .          .    .    .         .    .    .      public:
+         .    .    .          .    .    .         .    .    .        _Vector_impl _M_impl;
+         .    .    .          .    .    .         .    .    .  
+         .    .    .          .    .    .         .    .    .        pointer
+         .    .    .          .    .    .         .    .    .        _M_allocate(size_t __n)
+         .    .    .          .    .    .         .    .    .        {
+         .    .    .          .    .    .         .    .    .  	typedef __gnu_cxx::__alloc_traits<_Tp_alloc_type> _Tr;
+         .    .    .          .    .    .         .    .    .  	return __n != 0 ? _Tr::allocate(_M_impl, __n) : pointer();
+         .    .    .          .    .    .         .    .    .        }
+         .    .    .          .    .    .         .    .    .  
+         .    .    .          .    .    .         .    .    .        void
+       990   34    1          0    0    0       660    0    0        _M_deallocate(pointer __p, size_t __n)
+         .    .    .          .    .    .         .    .    .        {
+         .    .    .          .    .    .         .    .    .  	typedef __gnu_cxx::__alloc_traits<_Tp_alloc_type> _Tr;
+       330    0    0        165    0    0         0    0    0  	if (__p)
+       990    0    0        495    0    0       165    0    0  	  _Tr::deallocate(_M_impl, __p, __n);
+       495    0    0        330    0    0         0    0    0        }
+         .    .    .          .    .    .         .    .    .  
+         .    .    .          .    .    .         .    .    .      private:
+         .    .    .          .    .    .         .    .    .        void
+         .    .    .          .    .    .         .    .    .        _M_create_storage(size_t __n)
+         .    .    .          .    .    .         .    .    .        {
+         .    .    .          .    .    .         .    .    .  	this->_M_impl._M_start = this->_M_allocate(__n);
+         .    .    .          .    .    .         .    .    .  	this->_M_impl._M_finish = this->_M_impl._M_start;
+         .    .    .          .    .    .         .    .    .  	this->_M_impl._M_end_of_storage = this->_M_impl._M_start + __n;
+-- line 187 ----------------------------------------
+-- line 245 ----------------------------------------
+         .    .    .          .    .    .         .    .    .  
+         .    .    .          .    .    .         .    .    .      public:
+         .    .    .          .    .    .         .    .    .        // [23.2.4.1] construct/copy/destroy
+         .    .    .          .    .    .         .    .    .        // (assign() and get_allocator() are also listed in this section)
+         .    .    .          .    .    .         .    .    .  
+         .    .    .          .    .    .         .    .    .        /**
+         .    .    .          .    .    .         .    .    .         *  @brief  Creates a %vector with no elements.
+         .    .    .          .    .    .         .    .    .         */
+       660    0    0          0    0    0       330    0    0        vector()
+         .    .    .          .    .    .         .    .    .  #if __cplusplus >= 201103L
+         .    .    .          .    .    .         .    .    .        noexcept(is_nothrow_default_constructible<_Alloc>::value)
+         .    .    .          .    .    .         .    .    .  #endif
+       990   32    1        495    0    0       165    0    0        : _Base() { }
+         .    .    .          .    .    .         .    .    .  
+         .    .    .          .    .    .         .    .    .        /**
+         .    .    .          .    .    .         .    .    .         *  @brief  Creates a %vector with no elements.
+         .    .    .          .    .    .         .    .    .         *  @param  __a  An allocator object.
+         .    .    .          .    .    .         .    .    .         */
+         .    .    .          .    .    .         .    .    .        explicit
+         .    .    .          .    .    .         .    .    .        vector(const allocator_type& __a) _GLIBCXX_NOEXCEPT
+         .    .    .          .    .    .         .    .    .        : _Base(__a) { }
+-- line 265 ----------------------------------------
+-- line 415 ----------------------------------------
+         .    .    .          .    .    .         .    .    .  #endif
+         .    .    .          .    .    .         .    .    .  
+         .    .    .          .    .    .         .    .    .        /**
+         .    .    .          .    .    .         .    .    .         *  The dtor only erases the elements, and note that if the
+         .    .    .          .    .    .         .    .    .         *  elements themselves are pointers, the pointed-to memory is
+         .    .    .          .    .    .         .    .    .         *  not touched in any way.  Managing the pointer is the user's
+         .    .    .          .    .    .         .    .    .         *  responsibility.
+         .    .    .          .    .    .         .    .    .         */
+       825    3    0          0    0    0       495    0    0        ~vector() _GLIBCXX_NOEXCEPT
+     1,155    0    0        660    0    0       165    0    0        { std::_Destroy(this->_M_impl._M_start, this->_M_impl._M_finish,
+     1,980    0    0        825    0    0       330    0    0  		      _M_get_Tp_allocator()); }
+         .    .    .          .    .    .         .    .    .  
+         .    .    .          .    .    .         .    .    .        /**
+         .    .    .          .    .    .         .    .    .         *  @brief  %Vector assignment operator.
+         .    .    .          .    .    .         .    .    .         *  @param  __x  A %vector of identical element and allocator types.
+         .    .    .          .    .    .         .    .    .         *
+         .    .    .          .    .    .         .    .    .         *  All the elements of @a __x are copied, but any extra memory in
+         .    .    .          .    .    .         .    .    .         *  @a __x (for fast expansion) will not be copied.  Unlike the
+         .    .    .          .    .    .         .    .    .         *  copy constructor, the allocator object is not copied.
+-- line 433 ----------------------------------------
+-- line 771 ----------------------------------------
+         .    .    .          .    .    .         .    .    .         *  @return  Read/write reference to data.
+         .    .    .          .    .    .         .    .    .         *
+         .    .    .          .    .    .         .    .    .         *  This operator allows for easy, array-style, data access.
+         .    .    .          .    .    .         .    .    .         *  Note that data access with this operator is unchecked and
+         .    .    .          .    .    .         .    .    .         *  out_of_range lookups are not defined. (For checked lookups
+         .    .    .          .    .    .         .    .    .         *  see at().)
+         .    .    .          .    .    .         .    .    .         */
+         .    .    .          .    .    .         .    .    .        reference
+ 9,876,240  166    1          0    0    0 7,407,180    0    0        operator[](size_type __n) _GLIBCXX_NOEXCEPT
+24,690,600   35    1 12,345,300  166    0         0    0    0        { return *(this->_M_impl._M_start + __n); }
+         .    .    .          .    .    .         .    .    .  
+         .    .    .          .    .    .         .    .    .        /**
+         .    .    .          .    .    .         .    .    .         *  @brief  Subscript access to the data contained in the %vector.
+         .    .    .          .    .    .         .    .    .         *  @param __n The index of the element for which data should be
+         .    .    .          .    .    .         .    .    .         *  accessed.
+         .    .    .          .    .    .         .    .    .         *  @return  Read-only (constant) reference to data.
+         .    .    .          .    .    .         .    .    .         *
+         .    .    .          .    .    .         .    .    .         *  This operator allows for easy, array-style, data access.
+-- line 788 ----------------------------------------
+
+--------------------------------------------------------------------------------
+-- Auto-annotated source: /usr/include/opencv2/core/mat.hpp
+--------------------------------------------------------------------------------
+         Ir I1mr ILmr          Dr  D1mr DLmr         Dw D1mw DLmw 
+
+-- line 51 ----------------------------------------
+          .    .    .           .     .    .          .    .    .  #ifdef __cplusplus
+          .    .    .           .     .    .          .    .    .  
+          .    .    .           .     .    .          .    .    .  namespace cv
+          .    .    .           .     .    .          .    .    .  {
+          .    .    .           .     .    .          .    .    .  
+          .    .    .           .     .    .          .    .    .  //////////////////////////////// Mat ////////////////////////////////
+          .    .    .           .     .    .          .    .    .  
+          .    .    .           .     .    .          .    .    .  inline void Mat::initEmpty()
+      1,497   36    1           0     0    0        998    0    0  {
+        998    0    0         499     0    0        499    2    0      flags = MAGIC_VAL;
+      4,990    0    0       3,493     0    0      1,497    0    0      dims = rows = cols = 0;
+      6,986   36    1       4,990     0    0      1,996    0    0      data = datastart = dataend = datalimit = 0;
+        998   34    0         499     0    0        499    0    0      refcount = 0;
+        998    0    0         499     0    0        499    0    0      allocator = 0;
+      1,497    0    0         998     0    0          0    0    0  }
+          .    .    .           .     .    .          .    .    .  
+         30    4    2           6     0    0          8    0    0  inline Mat::Mat() : size(&rows)
+          .    .    .           .     .    .          .    .    .  {
+          6    0    0           2     0    0          2    0    0      initEmpty();
+          6    0    0           4     0    0          0    0    0  }
+          .    .    .           .     .    .          .    .    .  
+          .    .    .           .     .    .          .    .    .  inline Mat::Mat(int _rows, int _cols, int _type) : size(&rows)
+          .    .    .           .     .    .          .    .    .  {
+          .    .    .           .     .    .          .    .    .      initEmpty();
+          .    .    .           .     .    .          .    .    .      create(_rows, _cols, _type);
+          .    .    .           .     .    .          .    .    .  }
+          .    .    .           .     .    .          .    .    .  
+      9,443   70    1       1,491     0    0      3,976    0    0  inline Mat::Mat(int _rows, int _cols, int _type, const Scalar& _s) : size(&rows)
+          .    .    .           .     .    .          .    .    .  {
+      1,491    0    0         497     0    0        497    0    0      initEmpty();
+      2,982    0    0       1,988     0    0        497    0    0      create(_rows, _cols, _type);
+      2,485   35    1         994     0    0        497    0    0      *this = _s;
+      1,491    0    0         994     0    0          0    0    0  }
+          .    .    .           .     .    .          .    .    .  
+          .    .    .           .     .    .          .    .    .  inline Mat::Mat(Size _sz, int _type) : size(&rows)
+          .    .    .           .     .    .          .    .    .  {
+          .    .    .           .     .    .          .    .    .      initEmpty();
+          .    .    .           .     .    .          .    .    .      create( _sz.height, _sz.width, _type );
+          .    .    .           .     .    .          .    .    .  }
+          .    .    .           .     .    .          .    .    .  
+          .    .    .           .     .    .          .    .    .  inline Mat::Mat(Size _sz, int _type, const Scalar& _s) : size(&rows)
+-- line 91 ----------------------------------------
+-- line 266 ----------------------------------------
+          .    .    .           .     .    .          .    .    .  template<typename _Tp> inline Mat::Mat(const MatCommaInitializer_<_Tp>& commaInitializer)
+          .    .    .           .     .    .          .    .    .      : flags(MAGIC_VAL | DataType<_Tp>::type | CV_MAT_CONT_FLAG),
+          .    .    .           .     .    .          .    .    .      dims(0), rows(0), cols(0), data(0), refcount(0),
+          .    .    .           .     .    .          .    .    .      datastart(0), dataend(0), allocator(0), size(&rows)
+          .    .    .           .     .    .          .    .    .  {
+          .    .    .           .     .    .          .    .    .      *this = *commaInitializer;
+          .    .    .           .     .    .          .    .    .  }
+          .    .    .           .     .    .          .    .    .  
+      3,976   37    0           0     0    0      1,988  165    0  inline Mat::~Mat()
+          .    .    .           .     .    .          .    .    .  {
+      2,982    0    0         994     0    0        994    0    0      release();
+      5,964    0    0       2,982     0    0          0    0    0      if( step.p != step.buf )
+          .    .    .           .     .    .          .    .    .          fastFree(step.p);
+      2,982    0    0       1,988     0    0          0    0    0  }
+          .    .    .           .     .    .          .    .    .  
+          .    .    .           .     .    .          .    .    .  inline Mat& Mat::operator = (const Mat& m)
+          6    0    0           0     0    0          4    0    0  {
+          3    0    0           2     0    0          0    0    0      if( this != &m )
+          .    .    .           .     .    .          .    .    .      {
+          4    0    0           2     0    0          0    0    0          if( m.refcount )
+          3    0    0           4     1    0          0    0    0              CV_XADD(m.refcount, 1);
+          3    1    1           1     0    0          1    0    0          release();
+          4    0    0           3     0    0          1    0    0          flags = m.flags;
+          8    0    0           4     0    0          0    0    0          if( dims <= 2 && m.dims <= 2 )
+          .    .    .           .     .    .          .    .    .          {
+          4    1    1           3     0    0          1    0    0              dims = m.dims;
+          4    0    0           3     0    0          1    0    0              rows = m.rows;
+          4    0    0           3     0    0          1    0    0              cols = m.cols;
+         13    1    1           3     0    0          3    0    0              step[0] = m.step[0];
+         14    1    1           3     0    0          3    0    0              step[1] = m.step[1];
+          .    .    .           .     .    .          .    .    .          }
+          .    .    .           .     .    .          .    .    .          else
+          .    .    .           .     .    .          .    .    .              copySize(m);
+          4    0    0           3     0    0          1    0    0          data = m.data;
+          4    0    0           3     0    0          1    0    0          datastart = m.datastart;
+          4    1    1           3     0    0          1    0    0          dataend = m.dataend;
+          4    0    0           3     0    0          1    0    0          datalimit = m.datalimit;
+          4    0    0           3     0    0          1    0    0          refcount = m.refcount;
+          4    0    0           3     0    0          1    0    0          allocator = m.allocator;
+          .    .    .           .     .    .          .    .    .      }
+          1    0    0           1     0    0          0    0    0      return *this;
+          4    0    0           3     0    0          0    0    0  }
+          .    .    .           .     .    .          .    .    .  
+          .    .    .           .     .    .          .    .    .  inline Mat Mat::row(int y) const { return Mat(*this, Range(y, y+1), Range::all()); }
+          .    .    .           .     .    .          .    .    .  inline Mat Mat::col(int x) const { return Mat(*this, Range::all(), Range(x, x+1)); }
+          .    .    .           .     .    .          .    .    .  inline Mat Mat::rowRange(int startrow, int endrow) const
+          .    .    .           .     .    .          .    .    .      { return Mat(*this, Range(startrow, endrow), Range::all()); }
+          .    .    .           .     .    .          .    .    .  inline Mat Mat::rowRange(const Range& r) const
+          .    .    .           .     .    .          .    .    .      { return Mat(*this, r, Range::all()); }
+          .    .    .           .     .    .          .    .    .  inline Mat Mat::colRange(int startcol, int endcol) const
+-- line 315 ----------------------------------------
+-- line 340 ----------------------------------------
+          .    .    .           .     .    .          .    .    .  {
+          .    .    .           .     .    .          .    .    .      if( _type < 0 )
+          .    .    .           .     .    .          .    .    .          m = *this;
+          .    .    .           .     .    .          .    .    .      else
+          .    .    .           .     .    .          .    .    .          convertTo(m, _type);
+          .    .    .           .     .    .          .    .    .  }
+          .    .    .           .     .    .          .    .    .  
+          .    .    .           .     .    .          .    .    .  inline void Mat::create(int _rows, int _cols, int _type)
+      3,479   35    1           0     0    0      2,485    0    0  {
+        497    0    0         497     0    0          0    0    0      _type &= TYPE_MASK;
+      5,467   35    1       2,485     0    0          0    0    0      if( dims <= 2 && rows == _rows && cols == _cols && type() == _type && data )
+          .    .    .           .     .    .          .    .    .          return;
+      1,988    0    0         994     0    0        994    0    0      int sz[] = {_rows, _cols};
+      3,479   35    1         994     0    0        497   32    0      create(2, sz, _type);
+        994    0    0         994     0    0          0    0    0  }
+          .    .    .           .     .    .          .    .    .  
+          .    .    .           .     .    .          .    .    .  inline void Mat::create(Size _sz, int _type)
+          .    .    .           .     .    .          .    .    .  {
+          .    .    .           .     .    .          .    .    .      create(_sz.height, _sz.width, _type);
+          .    .    .           .     .    .          .    .    .  }
+          .    .    .           .     .    .          .    .    .  
+          .    .    .           .     .    .          .    .    .  inline void Mat::addref()
+          .    .    .           .     .    .          .    .    .  { if( refcount ) CV_XADD(refcount, 1); }
+          .    .    .           .     .    .          .    .    .  
+          .    .    .           .     .    .          .    .    .  inline void Mat::release()
+      3,980   38    1           0     0    0      1,990    0    0  {
+     13,922   38    1       5,966   485    0          0    0    0      if( refcount && CV_XADD(refcount, -1) == 1 )
+      2,979    0    0         993     0    0        993    1    0          deallocate();
+     13,930    6    0       9,950     0    0      3,980    0    0      data = datastart = dataend = datalimit = 0;
+      2,985    0    0       1,990     0    0        995    4    0      size.p[0] = 0;
+      1,990    0    0         995     0    0        995    0    0      refcount = 0;
+      2,985    0    0       1,990     0    0          0    0    0  }
+          .    .    .           .     .    .          .    .    .  
+          .    .    .           .     .    .          .    .    .  inline Mat Mat::operator()( Range _rowRange, Range _colRange ) const
+          .    .    .           .     .    .          .    .    .  {
+          .    .    .           .     .    .          .    .    .      return Mat(*this, _rowRange, _colRange);
+          .    .    .           .     .    .          .    .    .  }
+          .    .    .           .     .    .          .    .    .  
+          .    .    .           .     .    .          .    .    .  inline Mat Mat::operator()( const Rect& roi ) const
+          .    .    .           .     .    .          .    .    .  { return Mat(*this, roi); }
+-- line 379 ----------------------------------------
+-- line 525 ----------------------------------------
+          .    .    .           .     .    .          .    .    .      for( i = 0; i < d; i++ )
+          .    .    .           .     .    .          .    .    .      {
+          .    .    .           .     .    .          .    .    .          CV_DbgAssert( (unsigned)idx[i] < (unsigned)size.p[i] );
+          .    .    .           .     .    .          .    .    .          p += idx[i]*step.p[i];
+          .    .    .           .     .    .          .    .    .      }
+          .    .    .           .     .    .          .    .    .      return p;
+          .    .    .           .     .    .          .    .    .  }
+          .    .    .           .     .    .          .    .    .  
+ 90,706,780   36    0           0     0    0 72,565,424    1    0  template<typename _Tp> inline _Tp& Mat::at(int i0, int i1)
+          .    .    .           .     .    .          .    .    .  {
+          .    .    .           .     .    .          .    .    .      CV_DbgAssert( dims <= 2 && data && (unsigned)i0 < (unsigned)size.p[0] &&
+          .    .    .           .     .    .          .    .    .          (unsigned)(i1*DataType<_Tp>::channels) < (unsigned)(size.p[1]*channels()) &&
+          .    .    .           .     .    .          .    .    .          CV_ELEM_SIZE1(DataType<_Tp>::depth) == elemSize1());
+233,368,568  203    1 126,989,492 1,498    0          0    0    0      return ((_Tp*)(data + step.p[0]*i0))[i1];
+ 36,282,712    0    0  36,282,712     0    0          0    0    0  }
+          .    .    .           .     .    .          .    .    .  
+  4,140,040    0    0           0     0    0  3,312,032    0    0  template<typename _Tp> inline const _Tp& Mat::at(int i0, int i1) const
+          .    .    .           .     .    .          .    .    .  {
+          .    .    .           .     .    .          .    .    .      CV_DbgAssert( dims <= 2 && data && (unsigned)i0 < (unsigned)size.p[0] &&
+          .    .    .           .     .    .          .    .    .          (unsigned)(i1*DataType<_Tp>::channels) < (unsigned)(size.p[1]*channels()) &&
+          .    .    .           .     .    .          .    .    .          CV_ELEM_SIZE1(DataType<_Tp>::depth) == elemSize1());
+ 13,248,128   35    1   5,796,056   301    0          0    0    0      return ((const _Tp*)(data + step.p[0]*i0))[i1];
+  1,656,016    0    0   1,656,016     0    0          0    0    0  }
+          .    .    .           .     .    .          .    .    .  
+          .    .    .           .     .    .          .    .    .  template<typename _Tp> inline _Tp& Mat::at(Point pt)
+          .    .    .           .     .    .          .    .    .  {
+          .    .    .           .     .    .          .    .    .      CV_DbgAssert( dims <= 2 && data && (unsigned)pt.y < (unsigned)size.p[0] &&
+          .    .    .           .     .    .          .    .    .          (unsigned)(pt.x*DataType<_Tp>::channels) < (unsigned)(size.p[1]*channels()) &&
+          .    .    .           .     .    .          .    .    .          CV_ELEM_SIZE1(DataType<_Tp>::depth) == elemSize1());
+          .    .    .           .     .    .          .    .    .      return ((_Tp*)(data + step.p[0]*pt.y))[pt.x];
+          .    .    .           .     .    .          .    .    .  }
+-- line 555 ----------------------------------------
+-- line 698 ----------------------------------------
+          .    .    .           .     .    .          .    .    .          push_back_(&elem);
+          .    .    .           .     .    .          .    .    .  }
+          .    .    .           .     .    .          .    .    .  
+          .    .    .           .     .    .          .    .    .  template<typename _Tp> inline void Mat::push_back(const Mat_<_Tp>& m)
+          .    .    .           .     .    .          .    .    .  {
+          .    .    .           .     .    .          .    .    .      push_back((const Mat&)m);
+          .    .    .           .     .    .          .    .    .  }
+          .    .    .           .     .    .          .    .    .  
+      4,990   70    2       1,996     0    0      1,996  168    0  inline Mat::MSize::MSize(int* _p) : p(_p) {}
+          .    .    .           .     .    .          .    .    .  inline Size Mat::MSize::operator()() const
+          .    .    .           .     .    .          .    .    .  {
+          .    .    .           .     .    .          .    .    .      CV_DbgAssert(p[-1] <= 2);
+          .    .    .           .     .    .          .    .    .      return Size(p[1], p[0]);
+          .    .    .           .     .    .          .    .    .  }
+          .    .    .           .     .    .          .    .    .  inline const int& Mat::MSize::operator[](int i) const { return p[i]; }
+          .    .    .           .     .    .          .    .    .  inline int& Mat::MSize::operator[](int i) { return p[i]; }
+          .    .    .           .     .    .          .    .    .  inline Mat::MSize::operator const int*() const { return p; }
+-- line 714 ----------------------------------------
+-- line 727 ----------------------------------------
+          .    .    .           .     .    .          .    .    .      return true;
+          .    .    .           .     .    .          .    .    .  }
+          .    .    .           .     .    .          .    .    .  
+          .    .    .           .     .    .          .    .    .  inline bool Mat::MSize::operator != (const MSize& sz) const
+          .    .    .           .     .    .          .    .    .  {
+          .    .    .           .     .    .          .    .    .      return !(*this == sz);
+          .    .    .           .     .    .          .    .    .  }
+          .    .    .           .     .    .          .    .    .  
+      8,982   36    1       4,491     0    0      2,495  165    0  inline Mat::MStep::MStep() { p = buf; p[0] = p[1] = 0; }
+          .    .    .           .     .    .          .    .    .  inline Mat::MStep::MStep(size_t s) { p = buf; p[0] = s; p[1] = 0; }
+         24    0    0          10     0    0          6    0    0  inline const size_t& Mat::MStep::operator[](int i) const { return p[i]; }
+         24    0    0          10     0    0          6    0    0  inline size_t& Mat::MStep::operator[](int i) { return p[i]; }
+          .    .    .           .     .    .          .    .    .  inline Mat::MStep::operator size_t() const
+          .    .    .           .     .    .          .    .    .  {
+          .    .    .           .     .    .          .    .    .      CV_DbgAssert( p == buf );
+          .    .    .           .     .    .          .    .    .      return buf[0];
+          .    .    .           .     .    .          .    .    .  }
+          .    .    .           .     .    .          .    .    .  inline Mat::MStep& Mat::MStep::operator = (size_t s)
+          .    .    .           .     .    .          .    .    .  {
+          .    .    .           .     .    .          .    .    .      CV_DbgAssert( p == buf );
+-- line 746 ----------------------------------------
+
+--------------------------------------------------------------------------------
+The following files chosen for auto-annotation could not be found:
+--------------------------------------------------------------------------------
+  /build/eglibc-MjiXCM/eglibc-2.19/math/../sysdeps/ieee754/dbl-64/e_pow.c
+  /build/eglibc-MjiXCM/eglibc-2.19/math/w_pow.c
+  /build/eglibc-MjiXCM/eglibc-2.19/string/../sysdeps/x86_64/multiarch/../strcmp.S
+  /build/eglibc-MjiXCM/eglibc-2.19/string/../sysdeps/x86_64/multiarch/memcpy-sse2-unaligned.S
+  /build/eglibc-MjiXCM/eglibc-2.19/math/../sysdeps/x86_64/fpu/math_private.h
+  /build/eglibc-MjiXCM/eglibc-2.19/math/../sysdeps/ieee754/dbl-64/wordsize-64/math_private.h
+  /build/eglibc-MjiXCM/eglibc-2.19/elf/dl-lookup.c
+  /build/eglibc-MjiXCM/eglibc-2.19/math/w_sqrt.c
+
+--------------------------------------------------------------------------------
+Ir I1mr ILmr Dr D1mr DLmr Dw D1mw DLmw 
+--------------------------------------------------------------------------------
+46    4    1 56    3    0 48    0    0  percentage of events annotated
+

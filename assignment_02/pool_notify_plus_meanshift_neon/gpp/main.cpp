@@ -19,7 +19,7 @@
 int main(int argc, char ** argv)
 {
     char dspExecutable[] = "pool_notify.out";
-    char strBufferSize[] = "128";
+    char strBufferSize[] = "3456";
 
     Timer totalTimer("Total Time");
     int64_t startCycle, endCycle;

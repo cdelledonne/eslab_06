@@ -117,10 +117,10 @@ Int Task_create (Task_TransferInfo ** infoPtr)
 
     /*
      *  Wait for the event callback from the GPP-side to post the semaphore
-     *  indicating receipt of the data buffer pointer and image width and height.
+     *  indicating receipt of the data buffer pointer.
      */
-    SEM_pend (&(info->notifySemObj), SYS_FOREVER) ;
-    SEM_pend (&(info->notifySemObj), SYS_FOREVER) ;
+    SEM_pend (&(info->notifySemObj), SYS_FOREVER);
+    // SEM_pend (&(info->notifySemObj), SYS_FOREVER);
 
     return status ;
 }
@@ -140,7 +140,7 @@ Int Task_execute (Task_TransferInfo * info)
 
     /* initialise pdf matrices with smallest possible fixed point */
     for (i=0; i<NUMBER_OF_PLANES; i++) {
-        for (j=0; j<16; j++) {
+        for (j=0; j<16; j++) {
             pdf_model[i][j] = 1;
             pdf_candidate[i][j] = 1;
         }
@@ -176,7 +176,7 @@ Int Task_execute (Task_TransferInfo * info)
         //  pdf_model[1][pdf_update_index[1]] += pdf_value;
             pdf_model[2][pdf_update_index[2]] += pdf_value;
         }
-        else if (notif_payload & NOTIF_PDF_CANDIDATE) {
+        else if (notif_payload & NOTIF_PDF_CANDIDATE) {
             
             /* pdf_candidate indices in the payload, update matrix */
 

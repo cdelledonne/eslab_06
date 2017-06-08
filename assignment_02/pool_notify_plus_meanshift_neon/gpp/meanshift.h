@@ -41,7 +41,6 @@ public:
     int64_t weightCount;
     int64_t loopCount;
     int64_t weightLoopCount;
-    int64_t accCount;
     int64_t sqrtCount;
 #endif
 };

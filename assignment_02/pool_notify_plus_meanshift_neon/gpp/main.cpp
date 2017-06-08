@@ -19,7 +19,7 @@
 int main(int argc, char ** argv)
 {
     char dspExecutable[] = "pool_notify.out";
-    char strBufferSize[] = "3456";
+    char strBufferSize[] = "4992";
 
     Timer totalTimer("Total Time");
     int64_t startCycle, endCycle;
@@ -34,21 +34,19 @@ int main(int argc, char ** argv)
 
     cv::VideoCapture frame_capture;
 
-    if(argc<2)
-    {
+    if(argc<2) {
         printf ("Usage : %s car.avi\n", argv [0]);
         return -1;
     }
     else
-    {
         frame_capture = cv::VideoCapture(argv[1]);
-    }
 
     pool_notify_Init(dspExecutable, strBufferSize);
 
     // this is used for testing the car video
     // instead of selection of object of interest using mouse
-    cv::Rect rect(228,367,86,58);
+    // 228,367,86,58
+    cv::Rect rect(214,367,86,58);
     cv::Mat frame;
     frame_capture.read(frame);
     
@@ -66,8 +64,9 @@ int main(int argc, char ** argv)
     int TotalFrames = 32;
     int fcount;
 
+    /* Compute mask matrix for tracking area, used in MeanShift::track */
     int minSize = (rect.height < rect.width) ? rect.height : rect.width;
-    cv::Mat mult(minSize, minSize, CV_32S, cv::Scalar(1));
+    cv::Mat mask(minSize, minSize, CV_32S, cv::Scalar(1));
 
 #ifdef TIMING
     matCount -= cv::getTickCount();
@@ -79,7 +78,7 @@ int main(int argc, char ** argv)
         float norm_j = -1;
         for (int j=0; j<minSize; j++) {
             if (pow(norm_i,2)+pow(norm_j,2) > 1.0)
-                mult.at<int>(i,j) = 0;
+                mask.at<int>(i,j) = 0;
             norm_j += icentre;
         }
         norm_i += icentre;
@@ -113,7 +112,7 @@ int main(int argc, char ** argv)
 #endif
 
         // track object
-        cv::Rect ms_rect =  ms.track(frame, mult);
+        cv::Rect ms_rect =  ms.track(frame, mask);
 
 #ifdef TIMING
         trackCount += cv::getTickCount();
@@ -163,7 +162,6 @@ int main(int argc, char ** argv)
     std::cout << "├─> weight: " << ms.weightCount << " (" << ((float)(ms.weightCount)*100/(endCycle - startCycle)) << " %)" << std::endl;
     std::cout << "│   ├─> split: " << ms.splitCount << " (" << ((float)(ms.splitCount)*100/(endCycle - startCycle)) << " %)" << std::endl;
     std::cout << "│   ├─> loop: " << ms.weightLoopCount << " (" << ((float)(ms.weightLoopCount)*100/(endCycle - startCycle)) << " %)" << std::endl;
-    std::cout << "│   │   └─> acc_count: " << ms.accCount << " (" << ((float)(ms.accCount)*100/(endCycle - startCycle)) << " %)" << std::endl;
     std::cout << "│   └─> sqrt: " << ms.sqrtCount << " (" << ((float)(ms.sqrtCount)*100/(endCycle - startCycle)) << " %)" << std::endl;
     std::cout << "└─> loop: " << ms.loopCount << " (" << ((float)(ms.loopCount)*100/(endCycle - startCycle)) << " %)" << std::endl;
     std::cout << "write: " << writeCount << " (" << ((float)(writeCount)*100/(endCycle - startCycle)) << " %)" << std::endl;

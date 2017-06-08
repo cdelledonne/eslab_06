@@ -22,7 +22,6 @@ MeanShift::MeanShift()
     weightCount     = 0;
     loopCount       = 0;
     weightLoopCount = 0;
-    accCount        = 0;
     sqrtCount       = 0;
 #endif
 }
@@ -57,46 +56,10 @@ float  MeanShift::Epanechnikov_kernel(cv::Mat &kernel)
     return kernel_sum;
 }
 
-// cv::Mat MeanShift::pdf_representation(const cv::Mat &frame, const cv::Rect &rect)
-// {
-//     cv::Mat kernel(rect.height,rect.width,CV_32F,cv::Scalar(0));
-//     float normalized_C = 1.0 / Epanechnikov_kernel(kernel);
-// 
-//     cv::Mat pdf_model(8,16,CV_32F,cv::Scalar(1e-10));
-// 
-//     cv::Vec3b curr_pixel_value;
-//     cv::Vec3b bin_value;
-// 
-//     int row_index = rect.y;
-//     int clo_index = rect.x;
-// 
-//     for(int i=0;i<rect.height;i++)
-//     {
-//         clo_index = rect.x;
-//         for(int j=0;j<rect.width;j++)
-//         {
-//             curr_pixel_value = frame.at<cv::Vec3b>(row_index,clo_index);
-//             bin_value[0] = (curr_pixel_value[0] >> 4); //bin_width);
-//             bin_value[1] = (curr_pixel_value[1] >> 4); //bin_width);
-//             bin_value[2] = (curr_pixel_value[2] >> 4); //bin_width);
-// 
-//             // COLLAPSE 3 MULTIPLICATIONS INTO A SINGLE ONE
-//             pdf_model.at<float>(0,bin_value[0]) += kernel.at<float>(i,j)*normalized_C;
-//             pdf_model.at<float>(1,bin_value[1]) += kernel.at<float>(i,j)*normalized_C;
-//             pdf_model.at<float>(2,bin_value[2]) += kernel.at<float>(i,j)*normalized_C;
-//             // ***********************************************************************
-// 
-//             clo_index++;
-//         }
-//         row_index++;
-//     }
-// 
-//     return pdf_model;
-// 
-// }
+
 cv::Mat MeanShift::pdf_representation(const cv::Mat &frame, const cv::Rect &rect)
 {
-    cv::Mat pdf_model(8,16,CV_32F,cv::Scalar(1e-10));
+    cv::Mat pdf_model(3,16,CV_32F,cv::Scalar(1e-10));
 
     cv::Vec3b curr_pixel_value;
     cv::Vec3b bin_value;
@@ -140,7 +103,7 @@ cv::Mat MeanShift::CalWeight(const cv::Mat &window, cv::Mat &target_model,
     {
         for(int i=0;i<rows;i++)
         {
-            for(int j=0;j<60;j=j+4)
+            for(int j=14;j<74;j=j+4)
             {
                 uint32x4_t curr_pixel = {
                     (bgr_planes[k].at<uchar>(i,j)),
@@ -179,6 +142,8 @@ cv::Mat MeanShift::CalWeight(const cv::Mat &window, cv::Mat &target_model,
                 weight.at<float>(i,j+1) = vgetq_lane_f32(weight4,1);
                 weight.at<float>(i,j+2) = vgetq_lane_f32(weight4,2);
                 weight.at<float>(i,j+3) = vgetq_lane_f32(weight4,3);
+
+                // NEON SQRT ?
             }
         }
     }
@@ -200,7 +165,7 @@ cv::Mat MeanShift::CalWeight(const cv::Mat &window, cv::Mat &target_model,
     return weight;
 }
 
-cv::Rect MeanShift::track(const cv::Mat &next_frame, const cv::Mat &mult)
+cv::Rect MeanShift::track(const cv::Mat &next_frame, const cv::Mat &mask)
 {
     cv::Mat curr_window;
 
@@ -216,13 +181,11 @@ cv::Rect MeanShift::track(const cv::Mat &next_frame, const cv::Mat &mult)
     pdfCount += (ticksEnd - ticksStart);
 #endif
 
-    // static int count = 0;
-    // if (!count)
-    //     pool_notify_Execute(0);
-    // count++;
+    float centre = static_cast<float>((target_Region.height-1)/2);
+    float icentre = static_cast<float>(2.0/(target_Region.height-1));   // reciprocal of centre
+    int shift = (target_Region.width - target_Region.height) / 2;       // x-axis shift
+    float norm_j_shift = 14 * icentre;                                  // initial value for norm_j
 
-    float centre = static_cast<float>((mult.rows-1)/2);
-    float icentre = static_cast<float>(2.0/(mult.rows-1));
     cv::Rect next_rect;
 
     for(int iter=0; iter<cfg.MaxIter; iter++)
@@ -258,15 +221,17 @@ cv::Rect MeanShift::track(const cv::Mat &next_frame, const cv::Mat &mult)
         float norm_i = -1;
         for(int i=0; i<weight.rows; i++)
         {
-            float norm_j = -1;
+            float norm_j = -1 + norm_j_shift;
+            int shifted_col_index = shift;
             for(int j=0; j<weight.rows; j++)
             {
-                if (mult.at<int>(i,j)) {
-                    delta_x += static_cast<float>(norm_j*weight.at<float>(i,j));
-                    delta_y += static_cast<float>(norm_i*weight.at<float>(i,j));
-                    sum_wij += static_cast<float>(weight.at<float>(i,j));
+                if (mask.at<int>(i,j)) {
+                    delta_x += static_cast<float>(norm_j*weight.at<float>(i,shifted_col_index));
+                    delta_y += static_cast<float>(norm_i*weight.at<float>(i,shifted_col_index));
+                    sum_wij += static_cast<float>(weight.at<float>(i,shifted_col_index));
                 }
                 norm_j += icentre;
+                shifted_col_index++;
             }
             norm_i += icentre;
         }

@@ -14,10 +14,11 @@
 #include <notify.h>
 #include <bcache.h>
 
-/* ------------------------------------ Sample Headers ---------------------- */
+/* ------------------------------------ Application Headers ----------------- */
 #include <pool_notify_config.h>
 #include <task.h>
 #include <IQmath.h>
+#include <ti/dsplib/dsplib.h>
 
 /* ------------------------------------ Notification codes ------------------ */
 #define NOTIF_PDF_MODEL         0x10000000
@@ -28,7 +29,7 @@
 
 #define NUMBER_OF_PLANES        3
 #define MATRIX_WIDTH            58
-#define MATRIX_HEIGHT           8
+#define MATRIX_HEIGHT           20
 #define BUFFER_SIZE             (MATRIX_WIDTH * MATRIX_HEIGHT * 4)
 
 
@@ -39,9 +40,8 @@
 // pdf_model and pdf_candidate matrices
 _iq16 pdf_model[NUMBER_OF_PLANES][16];
 _iq16 pdf_candidate[NUMBER_OF_PLANES][16];
-
-// bgr_plane matrix
-_iq16 bgr_plane[MATRIX_HEIGHT][MATRIX_WIDTH];
+// float pdf_model[NUMBER_OF_PLANES][16];
+// float pdf_candidate[NUMBER_OF_PLANES][16];
 
 // flag for Task_execute routine
 Uint8 DSP_needed;
@@ -142,7 +142,7 @@ Int Task_execute (Task_TransferInfo * info)
 
     _iq16 div;
 
-    /* convert 1 into fixed point */
+    /* convert 1 to fixed point */
     _iq16 pdf_hiprob_value = _IQ16(1);
 
     DSP_needed = 1;
@@ -150,8 +150,8 @@ Int Task_execute (Task_TransferInfo * info)
     /* initialise pdf matrices with smallest possible fixed point */
     for (i=0; i<NUMBER_OF_PLANES; i++) {
         for (j=0; j<16; j++) {
-            pdf_model[i][j] = 1;
-            pdf_candidate[i][j] = 1;
+            pdf_model[i][j] = 1; // 1e-10;
+            pdf_candidate[i][j] = 1; // 1e-10;
         }
     }
 
@@ -163,11 +163,11 @@ Int Task_execute (Task_TransferInfo * info)
      *
      * In both cases the MSB of the payload indicates the content of
      * the buffer, specifically:
-     *     0x20000000 -> payload contains indices for the pdf_model matrix
-     *     0x40000000 -> payload contains indices for the pdf_candidate matrix
-     *     0x80000000 -> buffer contains bgr_plane[0]
-     *     0x80000001 -> buffer contains bgr_plane[1]
-     *     0x80000002 -> buffer contains bgr_plane[2]
+     *     0x10000000 -> payload contains indices for the pdf_model matrix
+     *     0x20000000 -> payload contains indices for the pdf_candidate matrix
+     *     0x40000000 -> buffer contains bgr_plane[0]
+     *     0x40000001 -> buffer contains bgr_plane[1]
+     *     0x40000002 -> buffer contains bgr_plane[2]
      *     else       -> DSP not needed anymore
      */
     while (DSP_needed) {
@@ -218,17 +218,15 @@ Int Task_execute (Task_TransferInfo * info)
             for (i=0; i<8; i++) {
                 for (j=0; j<MATRIX_WIDTH; j++) {
                     curr_pixel = unsignedBuffer[row_start + j];
-                    // bin_value = curr_pixel >> 4;
-                    // div = _IQ16div(pdf_model[0][bin_value], pdf_candidate[0][bin_value]);
-                    // signedBuffer[row_start + j] = pdf_candidate[plane][bin_value];
-
-                    signedBuffer[row_start + j] = curr_pixel + 1;
+                    bin_value = curr_pixel >> 4;
+                    div = _IQ16div(pdf_model[plane][bin_value], pdf_candidate[plane][bin_value]);
+                    floatBuffer[row_start + j] = _IQ16toF(div); // pdf_model[plane][bin_value] / pdf_candidate[plane][bin_value];
                 }
                 row_start += MATRIX_WIDTH;
             }
 
             /* write back on the buffer */
-            BCACHE_wb((Ptr)signedBuffer, BUFFER_SIZE, TRUE);
+            BCACHE_wb((Ptr)floatBuffer, BUFFER_SIZE, TRUE);
 
             /* notify the GPP */
             NOTIFY_notify(ID_GPP, MPCSXFER_IPS_ID, MPCSXFER_IPS_EVENTNO, (Uint32)notif_payload);

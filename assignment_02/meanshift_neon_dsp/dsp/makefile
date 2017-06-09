@@ -1,10 +1,11 @@
 SHELL = /bin/sh
 
 BASE_TOOLCHAIN := /data/bbToolChain/usr/local/share
-BASE_COMPILER := $(BASE_TOOLCHAIN)/c6000
-BASE_SABIOS := $(BASE_TOOLCHAIN)/tidspbios/bios_5_41_00_06
-BASE_BSL := $(BASE_COMPILER)
-BASE_IQM := /data/home/in4342-06/libs/iqmathlib
+BASE_COMPILER  := $(BASE_TOOLCHAIN)/c6000
+BASE_SABIOS    := $(BASE_TOOLCHAIN)/tidspbios/bios_5_41_00_06
+BASE_BSL       := $(BASE_COMPILER)
+BASE_IQM       := /data/home/in4342-06/libs/iqmathlib
+BASE_DSPLIB    := /data/home/in4342-06/libs/dsplib/components
 
 CC := cl6x
 TCONF := tconf
@@ -27,13 +28,24 @@ PROJNAME := pool_notify
 #   ----------------------------------------------------------------------------
 DEBUG :=
 # CFLAGS := -I$(BASE_BSL)/dsp/include -DP__ROFILE -s -mw
-CFLAGS := -I$(BASE_BSL)/dsp/include -I$(BASE_IQM)/include -DP__ROFILE -mw
-LDFLAGS := -i$(BASE_BSL)/dsp/lib -i$(BASE_IQM)/lib
+CFLAGS := -I$(BASE_BSL)/dsp/include -I$(BASE_IQM)/include -I$(BASE_DSPLIB) -DP__ROFILE -mw
+LDFLAGS := -i$(BASE_BSL)/dsp/lib -i$(BASE_IQM)/lib -i$(BASE_DSPLIB)/ti/dsplib/lib
 CSRCS := task.c pool_notify_config.c dsp_main.c
 ASRCS :=
 BIOSTCF := pool_notify.tcf
 OBJS :=
-LIBS := -lIQmath_c64x+.lib -lIQmath_ROM_c643x.lib -ldsplink.lib -ldsplinkpool.lib -ldsplinkmpcs.lib -ldsplinkmplist.lib -ldsplinkmsg.lib -ldsplinknotify.lib -ldsplinkringio.lib -ldsplinkdata.lib
+LIBS := -lIQmath_c64x+.lib      \
+        -lIQmath_ROM_c643x.lib  \
+        -ldsplib.lib            \
+        -ldsplink.lib           \
+        -ldsplinkpool.lib       \
+        -ldsplinkmpcs.lib       \
+        -ldsplinkmplist.lib     \
+        -ldsplinkmsg.lib        \
+        -ldsplinknotify.lib     \
+        -ldsplinkringio.lib     \
+        -ldsplinkdata.lib
+
 CMDS := $(PROJNAME).cmd
 MAPFILE := $(PROJNAME).map
 BIN := $(PROJNAME).out

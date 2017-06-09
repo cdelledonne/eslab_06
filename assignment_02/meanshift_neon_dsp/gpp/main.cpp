@@ -4,9 +4,11 @@
 #include <iostream>
 
 /* ------------------------------------ Application Headers ----------------- */
-#include "pool_notify.h"
 #include "meanshift.h"
 #include "Timer.h"
+#ifdef DSP /*******************************************************************/
+#include "pool_notify.h"
+#endif /* DSP *****************************************************************/
 
 #ifndef ARMCC
 #include "markers.h"
@@ -18,19 +20,15 @@
 
 int main(int argc, char ** argv)
 {
-    char dspExecutable[] = "pool_notify.out";
-    char strBufferSize[] = "65536";
-
     Timer totalTimer("Total Time");
-    int64_t startCycle, endCycle;
+    int64_t startCycle, endCycle, trackCount = 0;
 
-#ifdef TIMING
-    int64_t matCount, readCount, trackCount, writeCount;
+#ifdef TIMING /****************************************************************/
+    int64_t matCount, readCount, writeCount;
     matCount   = 0;
     readCount  = 0;
-    trackCount = 0;
     writeCount = 0;
-#endif
+#endif /* TIMING **************************************************************/
 
     cv::VideoCapture frame_capture;
 
@@ -41,7 +39,11 @@ int main(int argc, char ** argv)
     else
         frame_capture = cv::VideoCapture(argv[1]);
 
+#ifdef DSP /*******************************************************************/
+    char dspExecutable[] = "pool_notify.out";
+    char strBufferSize[] = "65536";
     pool_notify_Init(dspExecutable, strBufferSize);
+#endif /* DSP *****************************************************************/
 
     // this is used for testing the car video
     // instead of selection of object of interest using mouse
@@ -68,9 +70,9 @@ int main(int argc, char ** argv)
     int minSize = (rect.height < rect.width) ? rect.height : rect.width;
     cv::Mat mask(minSize, minSize, CV_32S, cv::Scalar(1));
 
-#ifdef TIMING
+#ifdef TIMING /****************************************************************/
     matCount -= cv::getTickCount();
-#endif
+#endif /* TIMING **************************************************************/
 
     float icentre = static_cast<float>(2.0/(minSize-1));
     float norm_i = -1;
@@ -84,69 +86,56 @@ int main(int argc, char ** argv)
         norm_i += icentre;
     }
 
-#ifdef TIMING
+#ifdef TIMING /****************************************************************/
     matCount += cv::getTickCount();
-#endif
+#endif /* TIMING **************************************************************/
 
     for(fcount=0; fcount<TotalFrames; ++fcount)
     {
 
-#ifdef TIMING
+#ifdef TIMING /****************************************************************/
         readCount -= cv::getTickCount();
-#endif
+#endif /* TIMING **************************************************************/
 
         // read a frame
         int status = frame_capture.read(frame);
         if( 0 == status ) break;
 
-#ifdef TIMING
+#ifdef TIMING /****************************************************************/
         readCount += cv::getTickCount();
-#endif
+#endif /* TIMING **************************************************************/
 
-        #ifndef ARMCC
-        // MCPROF_START();
-        #endif
-
-#ifdef TIMING
         trackCount -= cv::getTickCount();
-#endif
 
         // track object
         cv::Rect ms_rect =  ms.track(frame, mask);
 
-#ifdef TIMING
         trackCount += cv::getTickCount();
-#endif
 
-        #ifndef ARMCC
-        // MCPROF_STOP();
-        #endif
-        
         // mark the tracked object in frame
         cv::rectangle(frame,ms_rect,cv::Scalar(0,0,255),3);
 
-#ifdef TIMING
+#ifdef TIMING /****************************************************************/
         writeCount -= cv::getTickCount();
-#endif
+#endif /* TIMING **************************************************************/
 
         // write the frame
         writer << frame;
 
-#ifdef TIMING
+#ifdef TIMING /****************************************************************/
         writeCount += cv::getTickCount();
-#endif
+#endif /* TIMING **************************************************************/
 
     }
 
-    #ifndef ARMCC
-    MCPROF_STOP();
-    #endif
     endCycle = cv::getTickCount();
     totalTimer.Pause();
 
+#ifdef DSP /*******************************************************************/
     /* inform the DSP it is not needed anymore and delete the pool */
     notify_DSP(0);
     pool_notify_Delete(0);
+#endif /* DSP *****************************************************************/
 
     std::cout << std::endl;
     totalTimer.Print();
@@ -156,7 +145,8 @@ int main(int argc, char ** argv)
     std::cout << "FPS: " << fcount/totalTimer.GetTime() << std::endl;
     std::cout << "Total cycles: " << (endCycle - startCycle) << std::endl;
 
-#ifdef TIMING
+#ifdef TIMING /****************************************************************/
+    std::cout << std::endl;
     std::cout << "matrix: " << matCount << " (" << ((float)(matCount)*100/(endCycle - startCycle)) << " %)" << std::endl;
     std::cout << "read: " << readCount << " (" << ((float)(readCount)*100/(endCycle - startCycle)) << " %)" << std::endl;
     std::cout << "track: " << trackCount << " (" << ((float)(trackCount)*100/(endCycle - startCycle)) << " %)" << std::endl;
@@ -164,14 +154,17 @@ int main(int argc, char ** argv)
     std::cout << "├─> weight: " << ms.weightCount << " (" << ((float)(ms.weightCount)*100/(endCycle - startCycle)) << " %)" << std::endl;
     std::cout << "│   ├─> split: " << ms.splitCount << " (" << ((float)(ms.splitCount)*100/(endCycle - startCycle)) << " %)" << std::endl;
     std::cout << "│   ├─> loop: " << ms.weightLoopCount << " (" << ((float)(ms.weightLoopCount)*100/(endCycle - startCycle)) << " %)" << std::endl;
+#ifdef DSP /*******************************************************************/
+    std::cout << "│   │   ├─> write to buffer: " << ms.writeBufferCount << " (" << ((float)(ms.writeBufferCount)*100/(endCycle - startCycle)) << " %)" << std::endl;
+    std::cout << "│   │   └─> idle: " << ms.idleCount << " (" << ((float)(ms.idleCount)*100/(endCycle - startCycle)) << " %)" << std::endl;
+#endif /* DSP *****************************************************************/
     std::cout << "│   └─> sqrt: " << ms.sqrtCount << " (" << ((float)(ms.sqrtCount)*100/(endCycle - startCycle)) << " %)" << std::endl;
     std::cout << "└─> loop: " << ms.loopCount << " (" << ((float)(ms.loopCount)*100/(endCycle - startCycle)) << " %)" << std::endl;
     std::cout << "write: " << writeCount << " (" << ((float)(writeCount)*100/(endCycle - startCycle)) << " %)" << std::endl;
+#endif /* TIMING **************************************************************/
     std::cout << std::endl;
     std::cout << "Application speedup: " << BASELINE_TIME_MS/totalTimer.GetTime() << "x" << std::endl;
     std::cout << "Function speedup: " << BASELINE_TRACK_CYCLES/trackCount << "x" << std::endl;
-    std::cout << "Clock frequency: " <<  cv::getTickFrequency() << std::endl;
-#endif
 
     return 0;
 }

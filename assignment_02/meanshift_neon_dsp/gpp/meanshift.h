@@ -11,12 +11,10 @@
 class MeanShift
 {
  private:
-    float bin_width;
+    int bin_width;
+    int bin_width_log2;
     cv::Mat target_model;
     cv::Rect target_Region;
-
-    cv::Mat kernel;
-    float kernelSum;
 
     struct config{
         int num_bins;
@@ -33,7 +31,7 @@ public:
     cv::Mat CalWeight_opt(const cv::Mat &frame, cv::Mat &target_model, cv::Mat &target_candidate, cv::Rect &rec);
     cv::Rect track(const cv::Mat &next_frame, const cv::Mat &mult);
 
-    int count;
+    int frameCount;
 
 #ifdef TIMING
     int64_t splitCount;
@@ -42,6 +40,8 @@ public:
     int64_t loopCount;
     int64_t weightLoopCount;
     int64_t sqrtCount;
+    int64_t writeBufferCount;
+    int64_t idleCount;
 #endif
 };
 

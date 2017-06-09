@@ -85,10 +85,11 @@ ALL_CFLAGS_CPP := $(ALL_CFLAGS)                 \
 #   ----------------------------------------------------------------------------
 #   Compiler symbol definitions 
 #   ----------------------------------------------------------------------------
-#	NOTE: remove -DTIMING to suppress timing information on the output
+#   NOTE: remove -DTIMING to suppress timing information on the output
+#         remove -DDSP to run the code on the GPP only (faster)
+#         add -DDEBUG to enable extensive log for pool-notify mechanism
 DEFS :=        -DTIMING              \
                -DDSP                 \
-               -DDEBUG               \
                -DARMCC               \
                -DOS_LINUX            \
                -DMAX_DSPS=1          \

@@ -71,33 +71,6 @@ pool_notify_Create(IN Char8 * dspExecutable, IN Char8 * strBufferSize, IN Uint8 
 
 
 /** ============================================================================
- *  @func   pool_notify_Execute
- *
- *  @desc   This function implements the execute phase for this application.
- *
- *  @arg    numIterations
- *              Number of times to send the message to the DSP.
- *  @arg    processorId
- *             Id of the DSP Processor. 
- *
- *  @ret    DSP_SOK
- *              Operation successfully completed.
- *          DSP_EFAIL
- *              MESSAGE execution failed.
- *
- *  @enter  None
- *
- *  @leave  None
- *
- *  @see    pool_notify_Delete , pool_notify_Create
- *  ============================================================================
- */
-NORMAL_API
-DSP_STATUS
-pool_notify_Execute(IN Uint8 processorId);
-
-
-/** ============================================================================
  *  @func   pool_notify_Delete
  *
  *  @desc   This function releases resources allocated earlier by call to
@@ -127,20 +100,14 @@ pool_notify_Delete(IN Uint8 processorId);
 
 
 /** ============================================================================
- *  @func   pool_notify_Main
+ *  @func   pool_notify_Init
  *
- *  @desc   The OS independent driver function for the MESSAGE sample
- *          application.
+ *  @desc   Entry point for the pool_notify mechanism, called by main.cpp
  *
  *  @arg    dspExecutable
  *              Name of the DSP executable file.
  *  @arg    strBufferSize
  *              Buffer size to be used for data-transfer in string format.
- *  @arg    strNumIterations
- *              Number of iterations a data buffer is transferred between
- *              GPP and DSP in string format.
- *  @arg    strProcessorId
- *             ID of the DSP Processor in string format. 
  *
  *  @ret    None
  *
@@ -148,7 +115,7 @@ pool_notify_Delete(IN Uint8 processorId);
  *
  *  @leave  None
  *
- *  @see    pool_notify_Create, pool_notify_Execute, pool_notify_Delete
+ *  @see    pool_notify_Create, pool_notify_Delete
  *  ============================================================================
  */
 NORMAL_API

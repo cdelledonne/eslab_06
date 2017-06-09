@@ -1,20 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
-
-#include <semaphore.h>
-/*  ----------------------------------- DSP/BIOS Link                   */
-#include <dsplink.h>
-
-/*  ----------------------------------- DSP/BIOS LINK API               */
-#include <proc.h>
-#include <pool.h>
-#include <mpcs.h>
-#include <notify.h>
-#if defined (DA8XXGEM)
-#include <loaderdefs.h>
-#endif
 #include <string.h>
+
 #include "pool_notify.h"
 //#include <pool_notify_os.h>
 
@@ -149,14 +137,14 @@ Void notify_DSP(Uint32 notif_payload)
 {
     NOTIFY_notify (0, pool_notify_IPS_ID, pool_notify_IPS_EVENTNO, (Uint32)notif_payload);
 
-#ifdef DEBUG
+#ifdef DEBUG /*****************************************************************/
     if (notif_payload & NOTIF_PDF_MODEL)
         printf("[GPP] Model sent to buffer\n");
     else if (notif_payload & NOTIF_PDF_CANDIDATE)
         printf("[GPP] Candidate sent to buffer\n");
     else if (notif_payload & NOTIF_BGR_PLANE)
         printf("[GPP] Plane %lu sent to buffer\n", (notif_payload & PLANE_MASK));
-#endif
+#endif /* DEBUG ***************************************************************/
 }
 
 
@@ -170,11 +158,7 @@ Void write_buffer(uint32_t size)
                         (void*)&buf_dsp,
                         AddrType_Dsp,
                         (Void *) pool_notify_DataBuf,
-                        AddrType_Usr);
-                         
-    //NOTIFY_notify (0, pool_notify_IPS_ID, pool_notify_IPS_EVENTNO, (Uint32)notif_payload);
-
-    //printf("[GPP] Plane %lu sent to buffer\n", (notif_payload & PLANE_MASK));
+                        AddrType_Usr);                         
 }
 
 
@@ -199,9 +183,9 @@ NORMAL_API DSP_STATUS pool_notify_Create(IN Char8 * dspExecutable,
     SMAPOOL_Attrs   poolAttrs ;
     Char8 *         args [NUM_ARGS] ;
 
-	#ifdef DEBUG
+#ifdef DEBUG /*****************************************************************/
     printf ("Entered pool_notify_Create ()\n") ;
-	#endif
+#endif /* DEBUG ***************************************************************/
  
     sem_init(&sem,0,0);
 
@@ -343,50 +327,12 @@ NORMAL_API DSP_STATUS pool_notify_Create(IN Char8 * dspExecutable,
                  (int)status) ;
     }
 
-	#ifdef DEBUG
+#ifdef DEBUG /*****************************************************************/
     printf ("Leaving pool_notify_Create ()\n") ;
-	#endif
+#endif /* DEBUG ***************************************************************/
 
     return status ;
 }
-
-
-/** ============================================================================
- *  @func   pool_notify_Execute
- *
- *  @desc   This function implements the execute phase for this application.
- *
- *  @modif  None
- *  ============================================================================
- */
-/* 
-NORMAL_API DSP_STATUS pool_notify_Execute (Uint8 processorId)
-{
-    DSP_STATUS  status    = DSP_SOK ;
-
-    long long start;
-
-	#if defined(DSP)
-    unsigned char *buf_dsp;
-	#endif
-
-	#ifdef DEBUG
-    printf ("Entered pool_notify_Execute ()\n") ;
-	#endif
-
-    unit_init();
-
-    start = get_usec();
-
-	#if !defined(DSP)
-    printf(" Result is %d \n", sum_dsp(pool_notify_DataBuf,pool_notify_BufferSize));
-	#endif
-
-    printf("Sum execution time %lld us.\n", get_usec()-start);
-
-    return status ;
-}
-*/
 
 
 /** ============================================================================
@@ -406,9 +352,9 @@ NORMAL_API Void pool_notify_Delete (Uint8 processorId)
     DSP_STATUS status    = DSP_SOK ;
     DSP_STATUS tmpStatus = DSP_SOK ;
 
-	#ifdef DEBUG
+#ifdef DEBUG /*****************************************************************/
     printf ("Entered pool_notify_Delete ()\n") ;
-	#endif
+#endif /* DEBUG ***************************************************************/
 
     /*
      *  Stop execution on DSP.
@@ -471,16 +417,16 @@ NORMAL_API Void pool_notify_Delete (Uint8 processorId)
         printf ("PROC_destroy () failed. Status = [0x%x]\n", (int)status) ;
     }
 
-	#ifdef DEBUG
+#ifdef DEBUG /*****************************************************************/
     printf ("Leaving pool_notify_Delete ()\n") ;
-	#endif
+#endif /* DEBUG ***************************************************************/
 }
 
 
 /** ============================================================================
- *  @func   pool_notify_Main
+ *  @func   pool_notify_Init
  *
- *  @desc   Entry point for the application
+ *  @desc   Entry point for the pool_notify mechanism, called by main.cpp
  *
  *  @modif  None
  *  ============================================================================
@@ -492,9 +438,9 @@ NORMAL_API Void pool_notify_Init (IN Char8 * dspExecutable, IN Char8 * strBuffer
 
     pool_notify_BufferSize = DSPLINK_ALIGN(atoi(strBufferSize), DSPLINK_BUF_ALIGN);
 
-	#ifdef DEBUG
+#ifdef DEBUG /*****************************************************************/
     printf("Allocated a buffer of %d bytes\n", (int)pool_notify_BufferSize);
-	#endif
+#endif /* DEBUG ***************************************************************/
 
     /*
      *  Specify the dsp executable file name and the buffer size for
@@ -516,13 +462,13 @@ NORMAL_API Void pool_notify_Init (IN Char8 * dspExecutable, IN Char8 * strBuffer
  */
 STATIC Void pool_notify_Notify (Uint32 eventNo, Pvoid arg, Pvoid info)
 {
-	#ifdef DEBUG
+#ifdef DEBUG /*****************************************************************/
     if ((Uint32)info & NOTIF_BGR_PLANE)
     {
         Uint32 plane = (Uint32)info & PLANE_MASK;
         printf("[DSP] Plane %lu computed and sent back\n", plane);
     }
-	#endif
+#endif /* DEBUG ***************************************************************/
 
     /* Post the semaphore. */
     sem_post(&sem);

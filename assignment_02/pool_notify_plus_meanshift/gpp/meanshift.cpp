@@ -3,6 +3,7 @@
  * you can find all the formula in the paper
  */
 
+#include "arm_neon.h"
 #include "pool_notify.h"
 #include "meanshift.h"
 
@@ -131,27 +132,31 @@ cv::Mat MeanShift::CalWeight(const cv::Mat &window, cv::Mat &target_model,
 #ifdef TIMING
     ticksEnd = cv::getTickCount();
     splitCount += (ticksEnd - ticksStart);
-    // std::cout << "split: " << (ticksEnd - ticksStart) << ", ";
 
     ticksStart = cv::getTickCount();
 #endif
 
-    for(int k = 0; k < 3;  k++)
+    for(int i=0; i<rows; i++)
+    {
+        for(int j=0; j<rows; j++)
+        {
+            int curr_pixel = (bgr_planes[0].at<uchar>(i,j));
+            int bin_value = curr_pixel >> 4; // base 2 logarithm of bin_width is 4
+            weight.at<float>(i,j) = static_cast<float>(
+                (target_model.at<float>(0, bin_value)/target_candidate.at<float>(0, bin_value)));
+        }
+    }
+
+    for(int k = 1; k < 3;  k++)
     {
         for(int i=0; i<rows; i++)
         {
-            for(int j=0; j<cols; j++)
+            for(int j=0; j<rows; j++)
             {
                 int curr_pixel = (bgr_planes[k].at<uchar>(i,j));
-                // int bin_value = curr_pixel/bin_width;
                 int bin_value = curr_pixel >> 4; // base 2 logarithm of bin_width is 4
-                weight.at<float>(i,j) *= static_cast<float>((sqrt(target_model.at<float>(k, bin_value)/target_candidate.at<float>(k, bin_value))));
-                // weight.at<float>(i,j) *= static_cast<float>((target_model.at<float>(k, bin_value)/target_candidate.at<float>(k, bin_value)));
-                // if (count == 1)
-                //     std::cout << "w: " << weight.at<float>(i,j) 
-                //               << ", mod: " << target_model.at<float>(k, bin_value)
-                //               << ", cand: " << target_candidate.at<float>(k, bin_value)
-                //               << std::endl;
+                weight.at<float>(i,j) *= static_cast<float>(
+                    (target_model.at<float>(k, bin_value)/target_candidate.at<float>(k, bin_value)));
             }
         }
     }
@@ -159,17 +164,15 @@ cv::Mat MeanShift::CalWeight(const cv::Mat &window, cv::Mat &target_model,
 #ifdef TIMING
     ticksEnd = cv::getTickCount();
     weightLoopCount += (ticksEnd - ticksStart);
-    // std::cout << "w_loop: " << (ticksEnd - ticksStart) << ", ";
 
     ticksStart = cv::getTickCount();
 #endif
 
-    // cv::sqrt(weight, weight);
+    cv::sqrt(weight, weight);
 
 #ifdef TIMING
     ticksEnd = cv::getTickCount();
     sqrtCount += (ticksEnd - ticksStart);
-    // std::cout << "sqrt: " << (ticksEnd - ticksStart) << ", ";
 #endif
 
     return weight;

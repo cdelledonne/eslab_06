@@ -12,8 +12,8 @@
 #include "markers.h"
 #endif
 
-#define BASELINE_TIME_MS        12.341f
-#define BASELINE_TRACK_CYCLES   9500000000.0f
+#define BASELINE_TIME_MS                12.341f
+#define BASELINE_TRACK_CYCLES           9500000000.0f
 
 
 int main(int argc, char ** argv)

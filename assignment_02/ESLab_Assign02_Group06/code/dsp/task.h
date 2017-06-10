@@ -1,10 +1,10 @@
 #if !defined (TASK_)
 #define TASK_
 
-/*  ----------------------------------- DSP/BIOS Headers            */
+/*  ----------------------------------- DSP/BIOS Headers -------------------- */
 #include <sem.h>
 
-/*  ----------------------------------- Sample Headers              */
+/*  ----------------------------------- Sample Headers ---------------------- */
 #include <pool_notify_config.h>
 
 

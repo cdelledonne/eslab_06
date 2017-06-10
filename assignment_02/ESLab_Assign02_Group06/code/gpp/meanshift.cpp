@@ -14,7 +14,7 @@
 #ifdef DSP /*******************************************************************/
 
 /* Rows of the weight matrix to be computed on the DSP */
-#define ROWS_FOR_DSP            20
+#define ROWS_FOR_DSP            8
 
 #else
 
@@ -67,7 +67,7 @@ cv::Mat MeanShift::pdf_representation(const cv::Mat &frame, const cv::Rect &rect
      * the ellipse computed in MeanShift::Epanechnikov_kernel).
      *
      * Current version: maximum weight is assigned to one single pixel in the
-     * centre of the rectangle (degenerate case of smaller ellipse)
+     * centre of the rectangle (degenerate case of smaller ellipse).
      */
     curr_pixel_value = frame.at<cv::Vec3b>(rect.y + rect.height/2, rect.x + rect.width/2);
     bin_value[0] = (curr_pixel_value[0] >> bin_width_log2);

@@ -24,34 +24,27 @@
 #define NOTIF_PDF_MODEL         0x10000000
 #define NOTIF_PDF_CANDIDATE     0x20000000
 #define NOTIF_BGR_PLANE         0x40000000
-#define PLANE_MASK              0x00000003
+#define PLANE_MASK              0x00000003 // Extract BGR plane number from notification
 
 
 #define NUMBER_OF_PLANES        3
 #define MATRIX_WIDTH            58
-#define MATRIX_HEIGHT           20
+#define MATRIX_HEIGHT           8
 #define BUFFER_SIZE             (MATRIX_WIDTH * MATRIX_HEIGHT * 4)
 
 
-#define B                       16
-#define QDIV(X,Y)               ( (Int32)(((Int32)X << B) / Y) )
-
-
-// pdf_model and pdf_candidate matrices
+/* Target model and target candidate Q16 fixed-point matrices */
 _iq16 pdf_model[NUMBER_OF_PLANES][16];
 _iq16 pdf_candidate[NUMBER_OF_PLANES][16];
-// float pdf_model[NUMBER_OF_PLANES][16];
-// float pdf_candidate[NUMBER_OF_PLANES][16];
 
-// flag for Task_execute routine
+/* Flag for Task_execute routine */
 Uint8 DSP_needed;
 
-// notification payload
+/* Notification payload */
 Uint32 notif_payload;
 
-// buffer pointers
+/* Buffer pointers */
 Uint32* unsignedBuffer;
-_iq16*  signedBuffer;
 float*  floatBuffer;
 
 
@@ -135,23 +128,36 @@ Int Task_create (Task_TransferInfo ** infoPtr)
 Int Task_execute (Task_TransferInfo * info)
 {
     Uint8 i, j;
+
+    /**
+     * Old version: the pdf matrix elements would have different weight depending
+     * on the current pixel position (greater weights towards the centre of
+     * the ellipse computed in MeanShift::Epanechnikov_kernel).
+     *
+     * Current version: maximum weight is assigned to one single pixel in the
+     * centre of the rectangle (degenerate case of smaller ellipse).
+     *
+     * pdf_hiprob_index contains the column indices of the pdf_model (or candidate)
+     * elements to be assigned maximum probability.
+     */
     Uint8 pdf_hiprob_index[NUMBER_OF_PLANES];
-    Uint32 plane = 0;
 
     Uint32 curr_pixel, bin_value, row_start;
 
+    Uint32 plane = 0;
+
     _iq16 div;
 
-    /* convert 1 to fixed point */
+    /* Convert 1 to fixed point. */
     _iq16 pdf_hiprob_value = _IQ16(1);
 
     DSP_needed = 1;
 
-    /* initialise pdf matrices with smallest possible fixed point */
+    /* Initialise pdf matrices with smallest possible fixed-point. */
     for (i=0; i<NUMBER_OF_PLANES; i++) {
         for (j=0; j<16; j++) {
-            pdf_model[i][j] = 1; // 1e-10;
-            pdf_candidate[i][j] = 1; // 1e-10;
+            pdf_model[i][j] = 1;
+            pdf_candidate[i][j] = 1;
         }
     }
 
@@ -159,7 +165,7 @@ Int Task_execute (Task_TransferInfo * info)
      * Main DSP routine
      *
      * Notification payload may contain indices for the pdf matrices or
-     * nothing useful in case a bgr_plane is received.
+     * nothing useful in case a BGR plane is received.
      *
      * In both cases the MSB of the payload indicates the content of
      * the buffer, specifically:
@@ -168,16 +174,16 @@ Int Task_execute (Task_TransferInfo * info)
      *     0x40000000 -> buffer contains bgr_plane[0]
      *     0x40000001 -> buffer contains bgr_plane[1]
      *     0x40000002 -> buffer contains bgr_plane[2]
-     *     else       -> DSP not needed anymore
+     *     else (0)   -> DSP not needed anymore
      */
     while (DSP_needed) {
 
-        /* wait for notification from GPP */
+        /* Wait for notification from GPP. */
         SEM_pend (&(info->notifySemObj), SYS_FOREVER);
 
         if (notif_payload & NOTIF_PDF_MODEL) {
             
-            /* pdf_model indices in the payload, update matrix */
+            /* Target model indices in the payload, update matrix. */
 
             pdf_hiprob_index[0] = (Uint8)notif_payload;         // take first LSB
             pdf_hiprob_index[1] = (Uint8)(notif_payload >> 8);  // take second LSB
@@ -190,7 +196,7 @@ Int Task_execute (Task_TransferInfo * info)
 
         else if (notif_payload & NOTIF_PDF_CANDIDATE) {
             
-            /* pdf_candidate indices in the payload, update matrix */
+            /* Target candidate indices in the payload, update matrix. */
 
             pdf_candidate[0][pdf_hiprob_index[0]] = 1;
             pdf_candidate[1][pdf_hiprob_index[1]] = 1;
@@ -207,34 +213,35 @@ Int Task_execute (Task_TransferInfo * info)
 
         else if (notif_payload & NOTIF_BGR_PLANE) {
 
-            /* bgr_plane received, compute weights */
+            /* BGR plane received, compute weights. */
 
             plane = notif_payload & PLANE_MASK;
 
-            /* invalidate cache */
+            /* Invalidate cache. */
             BCACHE_inv((Ptr)unsignedBuffer, BUFFER_SIZE, TRUE);
 
+            /* Compute weights and convert to floating-point before writing. */
             row_start = 0;
-            for (i=0; i<8; i++) {
+            for (i=0; i<MATRIX_HEIGHT; i++) {
                 for (j=0; j<MATRIX_WIDTH; j++) {
                     curr_pixel = unsignedBuffer[row_start + j];
                     bin_value = curr_pixel >> 4;
                     div = _IQ16div(pdf_model[plane][bin_value], pdf_candidate[plane][bin_value]);
-                    floatBuffer[row_start + j] = _IQ16toF(div); // pdf_model[plane][bin_value] / pdf_candidate[plane][bin_value];
+                    floatBuffer[row_start + j] = _IQ16toF(div);
                 }
                 row_start += MATRIX_WIDTH;
             }
 
-            /* write back on the buffer */
+            /* Write back on the buffer. */
             BCACHE_wb((Ptr)floatBuffer, BUFFER_SIZE, TRUE);
 
-            /* notify the GPP */
+            /* Notify the GPP. */
             NOTIFY_notify(ID_GPP, MPCSXFER_IPS_ID, MPCSXFER_IPS_EVENTNO, (Uint32)notif_payload);
         }
 
         else {
 
-            /* DSP not needed anymore */
+            /* DSP not needed anymore. */
             DSP_needed = 0;
         }
     }
@@ -270,23 +277,20 @@ static Void Task_notify (Uint32 eventNo, Ptr arg, Ptr info)
     static int count = 0;
     Task_TransferInfo * mpcsInfo = (Task_TransferInfo *) arg;
 
-    (Void) eventNo ; /* To avoid compiler warning. */
+    /* To avoid compiler warning. */
+    (Void) eventNo;
 
     /**
-     * NOTIFICATION COUNT TABLE:
+     * First notification received contains the address of the pool buffer.
+     * Assign the address to the two pointers.
      *
-     * 1:      Notification payload contains the address of the data buffer
-     *
-     * 2:      Notification payload contains indices for the pdf_model matrix
-     *
-     * OTHERS: Payload may contain indices for the pdf_candidate matrix or
-     *         nothing in case the bgr_plane is received.
+     * Following notifications contain information to be used in the
+     * Task_execute DSP routine.
      */
 
     if (count == 0) {
-        unsignedBuffer = (Uint32*)info;
-        signedBuffer = (_iq16*)info;
-        floatBuffer = (float*)info;
+        unsignedBuffer = (Uint32*)info; // for reading from the buffer
+        floatBuffer = (float*)info;     // for writing on the buffer
     }
     else {
         notif_payload = (Uint32)info;

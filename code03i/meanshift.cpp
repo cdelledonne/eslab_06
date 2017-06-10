@@ -142,16 +142,16 @@ cv::Mat MeanShift::CalWeight(const cv::Mat &window, cv::Mat &target_model,
                 uint32x4_t bin_value=vshrq_n_u32(curr_pixel,4);
 
 
-                float32x4_t target_m={target_model.at<float>(k,vgetq_lane_u32(bin_value,0)),target_model.at<float>(k, vgetq_lane_u32(bin_value,1)),target_model.at<float>(k, vgetq_lane_u32(bin_value,2)),target_model.at<float>(k, vgetq_lane_u32(bin_value,3))};
+                float32x4_t target_m={target_model.at<float>(k,vgetq_lane_u32(bin_value,0)),target_model.at<float>(k, vgetq_lane_u1(bin_value,1)),target_model.at<float>(k, vgetq_lane_u16(bin_value,2)),target_model.at<float>(k, vgetq_lane_u16(bin_value,3))};
 
 
-                //float32x4_t target_m1={target_model.at<float>(k,vgetq_lane_u32(bin_value,4)),target_model.at<float>(k, vgetq_lane_u32(bin_value,5)),target_model.at<float>(k, vgetq_lane_u32(bin_value,6)),target_model.at<float>(k, vgetq_lane_u32(bin_value,7))};
+                //float32x4_t target_m1={target_model.at<float>(k,vgetq_lane_u16(bin_value,4)),target_model.at<float>(k, vgetq_lane_u16(bin_value,5)),target_model.at<float>(k, vgetq_lane_u16(bin_value,6)),target_model.at<float>(k, vgetq_lane_u16(bin_value,7))};
 
 
-                float32x4_t target_c={target_candidate.at<float>(k, vgetq_lane_u32(bin_value,0)),target_candidate.at<float>(k, vgetq_lane_u32(bin_value,1)),target_candidate.at<float>(k, vgetq_lane_u32(bin_value,2)),target_candidate.at<float>(k, vgetq_lane_u32(bin_value,3))};
+                float32x4_t target_c={target_candidate.at<float>(k, vgetq_lane_u16(bin_value,0)),target_candidate.at<float>(k, vgetq_lane_u16(bin_value,1)),target_candidate.at<float>(k, vgetq_lane_u16(bin_value,2)),target_candidate.at<float>(k, vgetq_lane_u16(bin_value,3))};
 
 
-                //float32x4_t target_c1={target_candidate.at<float>(k, vgetq_lane_u32(bin_value,4)),target_candidate.at<float>(k, vgetq_lane_u32(bin_value,5)),target_candidate.at<float>(k, vgetq_lane_u32(bin_value,6)),target_candidate.at<float>(k, vgetq_lane_u32(bin_value,7))};
+                //float32x4_t target_c1={target_candidate.at<float>(k, vgetq_lane_u16(bin_value,4)),target_candidate.at<float>(k, vgetq_lane_u16(bin_value,5)),target_candidate.at<float>(k, vgetq_lane_u16(bin_value,6)),target_candidate.at<float>(k, vgetq_lane_u16(bin_value,7))};
 
 
 

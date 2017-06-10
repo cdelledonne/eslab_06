@@ -138,7 +138,7 @@ int main(int argc, char ** argv)
 
 #ifdef DSP /*******************************************************************/
 
-    /* Inform the DSP it is not needed anymore and clear the pool */
+    /* Inform the DSP it is not needed any longer and clear the pool */
     notify_DSP(0);
     pool_notify_Delete(0);
 

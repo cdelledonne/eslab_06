@@ -29,7 +29,7 @@
 
 #define NUMBER_OF_PLANES        3
 #define MATRIX_WIDTH            58
-#define MATRIX_HEIGHT           8
+#define MATRIX_HEIGHT           24
 #define BUFFER_SIZE             (MATRIX_WIDTH * MATRIX_HEIGHT * 4)
 
 
@@ -174,7 +174,7 @@ Int Task_execute (Task_TransferInfo * info)
      *     0x40000000 -> buffer contains bgr_plane[0]
      *     0x40000001 -> buffer contains bgr_plane[1]
      *     0x40000002 -> buffer contains bgr_plane[2]
-     *     else (0)   -> DSP not needed anymore
+     *     else (0)   -> DSP not needed any longer
      */
     while (DSP_needed) {
 
@@ -241,7 +241,7 @@ Int Task_execute (Task_TransferInfo * info)
 
         else {
 
-            /* DSP not needed anymore. */
+            /* DSP not needed any longer. */
             DSP_needed = 0;
         }
     }

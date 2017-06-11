@@ -29,7 +29,7 @@
 
 #define NUMBER_OF_PLANES        3
 #define MATRIX_WIDTH            58
-#define MATRIX_HEIGHT           24
+#define MATRIX_HEIGHT           8
 #define BUFFER_SIZE             (MATRIX_WIDTH * MATRIX_HEIGHT * 4)
 
 

@@ -30,13 +30,13 @@ Viktoria Mavrikopoulou    4628225                                             ||
                                                                               ||
 +-- code                                                                      ||
 |   |                                                                         ||
-|   +-- dsp             DSP side source files                                 ||
+|   +-- dsp                     DSP side source files                         ||
 |   |                                                                         ||
-|   +-- gpp             GPP side source files                                 ||
+|   +-- gpp                     GPP side source files                         ||
 |                                                                             ||
 +-- report                                                                    ||
     |                                                                         ||
-    +-- report.pdf      Assignment report in pdf format                       ||
+    +-- Group06_report.pdf      Assignment report in pdf format               ||
                                                                               ||
 ================================================================================
 
@@ -46,7 +46,7 @@ Viktoria Mavrikopoulou    4628225                                             ||
 ================================================================================
                                                                               ||
 Compile the code  --->  The code has to be compiled on the eslab server       ||
-                        due to libraries and compilers dependences:           ||
+                        due to libraries and compilers dependencies:          ||
                                                                               ||
                         $ cd dsp                                              ||
                         $ make                                                ||

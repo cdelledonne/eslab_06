@@ -43,7 +43,7 @@ int main(int argc, char ** argv)
 
 #ifdef DSP /*******************************************************************/
     char dspExecutable[] = "pool_notify.out";
-    char strBufferSize[] = "65536";
+    char strBufferSize[] = "1920";
     pool_notify_Init(dspExecutable, strBufferSize);
 #endif /* DSP *****************************************************************/
 

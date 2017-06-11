@@ -14,7 +14,7 @@
 #ifdef DSP /*******************************************************************/
 
 /* Rows of the weight matrix to be computed on the DSP */
-#define ROWS_FOR_DSP            24
+#define ROWS_FOR_DSP            8
 
 #else
 
